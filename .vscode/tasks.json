@@ -96,6 +96,19 @@
             "netCore": {
                 "appProject": "${workspaceFolder}/EFrameWork/EFrameWork.csproj"
             }
+        },
+        {
+            "type": "docker-build",
+            "label": "docker-build",
+            "platform": "node",
+            "dockerBuild": {
+                "dockerfile": "${workspaceFolder}/orgweb/Dockerfile",
+                "context": "${workspaceFolder}/orgweb",
+                "pull": true
+            },
+            "node": {
+                "package": "${workspaceFolder}/orgweb/package.json"
+            }
         }
     ]
 }

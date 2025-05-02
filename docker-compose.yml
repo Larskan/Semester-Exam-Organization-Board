@@ -27,14 +27,20 @@ services:
       migration_service:
         condition: service_completed_successfully
 
-  migration_service:
-    build:
-      context: .
-      dockerfile: EFrameWork/Dockerfile
-    depends_on:
-      organizationboard-db:
-        condition: service_healthy
+    migration_service:
+      build:
+        context: .
+        dockerfile: EFrameWork/Dockerfile
+      depends_on:
+        organizationboard-db:
+          condition: service_healthy
 
-  
+    orgweb:
+      build:
+        context: .
+        dockerfile: orgweb/Dockerfile
+      ports:
+        - 8081:8081
+    
 volumes:
   mssql-user:
