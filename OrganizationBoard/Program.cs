@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 
 var configuration = builder.Configuration;
-builder.Services.AddDbContext<AGWDbContext>(options =>
+builder.Services.AddDbContext<OBDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
 );
 

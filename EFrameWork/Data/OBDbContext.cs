@@ -2,16 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using EFrameWork.Model;
 using Microsoft.EntityFrameworkCore;
 using Model;
 
 namespace EFramework.Data
 {
-    public class AGWDbContext : DbContext
+    public class OBDbContext : DbContext
     {
-        public AGWDbContext(DbContextOptions<AGWDbContext> options) : base(options) { }
-        public AGWDbContext() { }
+        public OBDbContext(DbContextOptions<OBDbContext> options) : base(options) { }
+        public OBDbContext() { }
 
         public virtual DbSet<Role>? RoleTables { get; set; }
         public virtual DbSet<Status>? StatusTables { get; set; }
@@ -19,6 +20,8 @@ namespace EFramework.Data
         public virtual DbSet<Team>? TeamTables { get; set; }
         public virtual DbSet<User>? UserTables { get; set; }
         public virtual DbSet<UserToTask>? UserToTaskTables { get; set; }
+        public virtual DbSet<Organization>? OrganizationTables { get; set; }
+        public virtual DbSet<Board>? BoardTables { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,14 +35,24 @@ namespace EFramework.Data
                 .HasForeignKey(u => u.RoleID);
 
             modelBuilder.Entity<User>()
+                .HasOne(u => u.Organization)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.OrganizationID);
+
+            modelBuilder.Entity<User>()
                 .HasOne(u => u.Team)
                 .WithMany(t => t.Users)
                 .HasForeignKey(u => u.TeamID);
 
+            modelBuilder.Entity<Board>()
+                .HasOne(u => u.Team)
+                .WithMany(t => t.Boards)
+                .HasForeignKey(u => u.TeamID);
+
             modelBuilder.Entity<EFrameWork.Model.Task>()
-                .HasOne(t => t.Team)
-                .WithMany(team => team.Tasks)
-                .HasForeignKey(t => t.TeamID);
+                .HasOne(t => t.Board)
+                .WithMany(b => b.Tasks)
+                .HasForeignKey(t => t.BoardID);
 
             modelBuilder.Entity<EFrameWork.Model.Task>()
                 .HasOne(t => t.Status)
@@ -57,6 +70,27 @@ namespace EFramework.Data
                 .WithMany(t => t.UserAssignments)
                 .HasForeignKey(ut => ut.TaskID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Team>().HasData(
+                new Team {TeamID = 1, TeamName = "team 1"},
+                new Team {TeamID = 2, TeamName = "team 2"}
+            );
+
+            modelBuilder.Entity<Organization>().HasData(
+                new Organization{OrganizationID = 1, OrganizationName = "Lars"}
+            );
+
+            modelBuilder.Entity<Role>().HasData(
+                new Role {RoleID = 1, RoleName = "Admin"},
+                new Role {RoleID = 2, RoleName = "Team Lead"},
+                new Role {RoleID = 3, RoleName = "Team Member"}
+            );
+
+            modelBuilder.Entity<User>().HasData(
+                new User {UserID = 1, Email = "Mail1", Password = "1234", TeamID = 1, RoleID = 1, OrganizationID = 1},
+                new User {UserID = 2, Email = "Mail1", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1},
+                new User {UserID = 3, Email = "Mail1", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1}
+            );
         }
     }
 }
