@@ -19,6 +19,10 @@ namespace EFrameWork.Model
 
         [ForeignKey("RoleID")]
         public Role Role { get; set; }
+        [Required]
+        public int OrganizationID { get; set; }
+        [ForeignKey("OrganizationID")]
+        public Organization Organization { get; set; }
 
         [Required]
         public int TeamID { get; set; }
