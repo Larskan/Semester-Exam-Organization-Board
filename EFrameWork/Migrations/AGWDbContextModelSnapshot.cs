@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EFrameWork.Migrations
 {
-    [DbContext(typeof(AGWDbContext))]
+    [DbContext(typeof(OBDbContext))]
     partial class AGWDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

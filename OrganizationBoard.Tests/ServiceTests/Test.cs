@@ -1,6 +1,7 @@
 ﻿using Xunit.Abstractions;
 
-namespace OrganizationBoard.Tests;
+namespace OrganizationBoard.Tests.ServiceTests;
+using OrganizationBoard.Service;
 
 public class Test
 {

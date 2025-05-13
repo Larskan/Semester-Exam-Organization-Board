@@ -1,4 +1,4 @@
-sleep 1
+sleep 30
 
 cd /app/EFrameWork
 dotnet tool install --global dotnet-ef
