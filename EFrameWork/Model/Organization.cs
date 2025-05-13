@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace EFrameWork.Model
 {
-    public class Team
+    public class Organization
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int TeamID { get; set; }
+        public int OrganizationID { get; set; }
         [Required]
-        public string TeamName { get; set; }
-        public ICollection<Board> Boards { get; set; }
+        public string OrganizationName { get; set; }
+
         public ICollection<User> Users { get; set; }
     }
 }

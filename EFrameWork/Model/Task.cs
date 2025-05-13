@@ -15,9 +15,9 @@ namespace EFrameWork.Model
         public int TaskID { get; set; }
 
         [Required]
-        public int TeamID { get; set; }
-        [ForeignKey("TeamID")]
-        public Team Team { get; set; }
+        public int BoardID { get; set; }
+        [ForeignKey("BoardID")]
+        public Board Board { get; set; }
 
         [Required]
         public int StatusID { get; set; }

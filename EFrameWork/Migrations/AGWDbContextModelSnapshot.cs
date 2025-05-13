@@ -22,6 +22,52 @@ namespace EFrameWork.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("EFrameWork.Model.Board", b =>
+                {
+                    b.Property<int>("BoardID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BoardID"));
+
+                    b.Property<string>("BoardName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TeamID")
+                        .HasColumnType("int");
+
+                    b.HasKey("BoardID");
+
+                    b.HasIndex("TeamID");
+
+                    b.ToTable("BoardTables");
+                });
+
+            modelBuilder.Entity("EFrameWork.Model.Organization", b =>
+                {
+                    b.Property<int>("OrganizationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrganizationID"));
+
+                    b.Property<string>("OrganizationName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrganizationID");
+
+                    b.ToTable("OrganizationTables");
+
+                    b.HasData(
+                        new
+                        {
+                            OrganizationID = 1,
+                            OrganizationName = "Lars"
+                        });
+                });
+
             modelBuilder.Entity("EFrameWork.Model.Task", b =>
                 {
                     b.Property<int>("TaskID")
@@ -29,6 +75,9 @@ namespace EFrameWork.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskID"));
+
+                    b.Property<int>("BoardID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -42,18 +91,15 @@ namespace EFrameWork.Migrations
                     b.Property<int>("StatusID")
                         .HasColumnType("int");
 
-                    b.Property<int>("TeamID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TaskID");
 
-                    b.HasIndex("StatusID");
+                    b.HasIndex("BoardID");
 
-                    b.HasIndex("TeamID");
+                    b.HasIndex("StatusID");
 
                     b.ToTable("TaskTables");
                 });
@@ -73,6 +119,18 @@ namespace EFrameWork.Migrations
                     b.HasKey("TeamID");
 
                     b.ToTable("TeamTables");
+
+                    b.HasData(
+                        new
+                        {
+                            TeamID = 1,
+                            TeamName = "team 1"
+                        },
+                        new
+                        {
+                            TeamID = 2,
+                            TeamName = "team 2"
+                        });
                 });
 
             modelBuilder.Entity("EFrameWork.Model.User", b =>
@@ -87,6 +145,9 @@ namespace EFrameWork.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrganizationID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -99,11 +160,42 @@ namespace EFrameWork.Migrations
 
                     b.HasKey("UserID");
 
+                    b.HasIndex("OrganizationID");
+
                     b.HasIndex("RoleID");
 
                     b.HasIndex("TeamID");
 
                     b.ToTable("UserTables");
+
+                    b.HasData(
+                        new
+                        {
+                            UserID = 1,
+                            Email = "Mail1",
+                            OrganizationID = 1,
+                            Password = "1234",
+                            RoleID = 1,
+                            TeamID = 1
+                        },
+                        new
+                        {
+                            UserID = 2,
+                            Email = "Mail1",
+                            OrganizationID = 1,
+                            Password = "1234",
+                            RoleID = 2,
+                            TeamID = 2
+                        },
+                        new
+                        {
+                            UserID = 3,
+                            Email = "Mail1",
+                            OrganizationID = 1,
+                            Password = "1234",
+                            RoleID = 3,
+                            TeamID = 1
+                        });
                 });
 
             modelBuilder.Entity("EFrameWork.Model.UserToTask", b =>
@@ -145,6 +237,23 @@ namespace EFrameWork.Migrations
                     b.HasKey("RoleID");
 
                     b.ToTable("RoleTables");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleID = 1,
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleID = 2,
+                            RoleName = "Team Lead"
+                        },
+                        new
+                        {
+                            RoleID = 3,
+                            RoleName = "Team Member"
+                        });
                 });
 
             modelBuilder.Entity("Model.Status", b =>
@@ -164,27 +273,44 @@ namespace EFrameWork.Migrations
                     b.ToTable("StatusTables");
                 });
 
+            modelBuilder.Entity("EFrameWork.Model.Board", b =>
+                {
+                    b.HasOne("EFrameWork.Model.Team", "Team")
+                        .WithMany("Boards")
+                        .HasForeignKey("TeamID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("EFrameWork.Model.Task", b =>
                 {
+                    b.HasOne("EFrameWork.Model.Board", "Board")
+                        .WithMany("Tasks")
+                        .HasForeignKey("BoardID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Model.Status", "Status")
                         .WithMany("Tasks")
                         .HasForeignKey("StatusID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EFrameWork.Model.Team", "Team")
-                        .WithMany("Tasks")
-                        .HasForeignKey("TeamID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Board");
 
                     b.Navigation("Status");
-
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("EFrameWork.Model.User", b =>
                 {
+                    b.HasOne("EFrameWork.Model.Organization", "Organization")
+                        .WithMany("Users")
+                        .HasForeignKey("OrganizationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Model.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleID")
@@ -196,6 +322,8 @@ namespace EFrameWork.Migrations
                         .HasForeignKey("TeamID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Organization");
 
                     b.Navigation("Role");
 
@@ -221,6 +349,16 @@ namespace EFrameWork.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("EFrameWork.Model.Board", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("EFrameWork.Model.Organization", b =>
+                {
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("EFrameWork.Model.Task", b =>
                 {
                     b.Navigation("UserAssignments");
@@ -228,7 +366,7 @@ namespace EFrameWork.Migrations
 
             modelBuilder.Entity("EFrameWork.Model.Team", b =>
                 {
-                    b.Navigation("Tasks");
+                    b.Navigation("Boards");
 
                     b.Navigation("Users");
                 });
