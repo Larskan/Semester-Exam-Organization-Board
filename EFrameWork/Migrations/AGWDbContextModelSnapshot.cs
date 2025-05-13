@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EFrameWork.Migrations
 {
-    [DbContext(typeof(AGWDbContext))]
-    partial class AGWDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(OBDbContext))]
+    partial class OBDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
