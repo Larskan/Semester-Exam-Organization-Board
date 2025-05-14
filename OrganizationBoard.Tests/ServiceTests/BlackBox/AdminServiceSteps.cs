@@ -1,5 +1,5 @@
 using OrganizationBoard.IService;
-using OrganizationBoard.Model;
+using EFrameWork.Model;
 using OrganizationBoard.DTO;
 using Moq;
 using FluentAssertions;
@@ -42,7 +42,7 @@ public class AdminServiceSteps
                 IsSuccess = true,
                 Data = new User
                 {
-                    UserId = 1,
+                    UserID = 1,
                     Email = _userToCreate.Email,
                     Password = _userToCreate.Password,
                 },
@@ -51,10 +51,11 @@ public class AdminServiceSteps
     }
 
     [When(@"I try to create a new user with this data")]
-    public async Task WhenITryToCreateANewUserWithThisData()
+    public async Task<User> WhenITryToCreateANewUserWithThisData()
     {
         // Hier "programmieren wir gegen das Interface", da die Implementierung noch fehlt
         _creationResult = await _mockAdminService.Object.CreateUser(_userToCreate, _requestingAdminId);
+        return _creationResult.Data;
     }
 
     [Then(@"the operation should be successful")]
@@ -67,7 +68,7 @@ public class AdminServiceSteps
     public void ThenANewUserWithTheSpecifiedDataAndAUniqueIDShouldHaveBeenCreated()
     {
         _creationResult.Data.Should().NotBeNull();
-        _creationResult.Data.UserId.Should().BeGreaterThan(0); // Annahme: ID wird automatisch generiert
+        _creationResult.Data.UserID.Should().BeGreaterThan(0); // Annahme: ID wird automatisch generiert
         _creationResult.Data.Email.Should().Be(_userToCreate.Email);
         _creationResult.Data.Password.Should().Be(_userToCreate.Password);
     }
