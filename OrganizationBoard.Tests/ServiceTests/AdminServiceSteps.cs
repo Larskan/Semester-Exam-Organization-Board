@@ -31,8 +31,8 @@ public class AdminServiceSteps
     {
         _userToCreate = new User
         {
-            Email = table.Rows[0]["Name"],
-            Password = table.Rows[0]["Email"]
+            Email = table.Rows[0]["Email"],
+            Password = table.Rows[0]["Password"] //Maybe engangspassword
         };
 
         // Mock the CreateUser method

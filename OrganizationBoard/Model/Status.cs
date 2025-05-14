@@ -8,6 +8,13 @@ namespace OrganizationBoard.Model
     public class Status
     {
         public int StatusId { get; set; }
-        public required string StatusName { get; set; }
+        public required TaskStatus StatusOption { get; set; }
+    }
+
+    public enum TaskStatus{
+        NotStarted,
+        Ongoing,
+        Done
     }
 }
+    

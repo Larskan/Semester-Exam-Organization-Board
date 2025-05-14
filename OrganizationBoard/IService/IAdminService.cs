@@ -25,10 +25,10 @@ namespace OrganizationBoard.IService
         Task<OperationResponse<bool>> AssignRoleToUser(int userId, int roleId, int requestingAdminId);
 
         //Organization Management
-        Task<OperationResponse<Organization>> CreateOrganization(Organization organization, int requestingAdminId);
+        //Task<OperationResponse<Organization>> CreateOrganization(Organization organization, int requestingAdminId);
         Task<OperationResponse<Organization>> GetOrganization(int organizationId, int requestingAdminId);
         Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId);
-        Task<OperationResponse<bool>> DeleteOrganization(int organizationId, int requestingAdminId);
-        Task<OperationResponse<List<Organization>>> GetAllOrganizations(int requestingAdminId);
+        Task<OperationResponse<bool>> DeleteOrganization(int organizationId, int requestingAdminId); //Discuss
+        //Task<OperationResponse<List<Organization>>> GetAllOrganizations(int requestingAdminId);
     }
 }

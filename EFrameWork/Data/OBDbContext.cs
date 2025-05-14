@@ -81,15 +81,15 @@ namespace EFramework.Data
             );
 
             modelBuilder.Entity<Role>().HasData(
-                new Role {RoleID = 1, RoleName = "Admin"},
-                new Role {RoleID = 2, RoleName = "Team Lead"},
-                new Role {RoleID = 3, RoleName = "Team Member"}
+                new Role {RoleID = 1, RoleName = RoleStatus.Admin},
+                new Role {RoleID = 2, RoleName = RoleStatus.TeamLeader},
+                new Role {RoleID = 3, RoleName = RoleStatus.TeamMember}
             );
 
             modelBuilder.Entity<User>().HasData(
                 new User {UserID = 1, Email = "Mail1", Password = "1234", TeamID = 1, RoleID = 1, OrganizationID = 1},
-                new User {UserID = 2, Email = "Mail1", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1},
-                new User {UserID = 3, Email = "Mail1", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1}
+                new User {UserID = 2, Email = "Mail2", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1},
+                new User {UserID = 3, Email = "Mail3", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1}
             );
         }
     }
