@@ -10,7 +10,7 @@ namespace OrganizationBoard.IService
     {
         // Task Management
         Task<OperationResponse<EFrameWork.Model.Task>> CreateTask(EFrameWork.Model.Task task, int userId); // Only Team Leader
-        Task<OperationResponse<EFrameWork.Model.Task>> GetTask(int taskId);  //Team Leader and Members
+        Task<OperationResponse<EFrameWork.Model.Task>> GetTask(int taskId, int userId);  //Team Leader and Members
         Task<OperationResponse<EFrameWork.Model.Task>> UpdateTask(EFrameWork.Model.Task task, int userId); // Team Leader can update all, members can only update assigned to
         Task<OperationResponse<bool>> DeleteTask(int taskId, int userId); // Only Team Leader
         Task<OperationResponse<List<EFrameWork.Model.Task>>> GetBoardTasks(int boardId, int userId); // All in team can see.
