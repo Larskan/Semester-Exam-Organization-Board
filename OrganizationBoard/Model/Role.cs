@@ -8,6 +8,13 @@ namespace OrganizationBoard.Model
     public class Role
     {
         public int RoleId { get; set; }
-        public required string RoleName { get; set; }
+        public required RoleStatus RoleName { get; set; }
+    }
+
+    public enum RoleStatus
+    {
+        Admin,
+        TeamLeader,
+        TeamMember
     }
 }
