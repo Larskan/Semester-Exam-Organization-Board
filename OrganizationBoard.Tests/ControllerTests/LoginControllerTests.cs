@@ -1,6 +1,7 @@
 ﻿using Xunit.Abstractions;
 
-namespace OrganizationBoard.Tests;
+namespace OrganizationBoard.Tests.ControllerTests;
+using OrganizationBoard.Controller;
 
 public class LoginControllerTest
 {
@@ -12,16 +13,15 @@ public class LoginControllerTest
 
     }
 
+    //TODO: Add tests for LoginController
     [Fact]
     public void Test1()
     {
         //Arrange
-        int a = 1;
-        int b = 2;
+   
         //Act
-        int c = a+b;
+  
         //Assert
-        _outputHelper.WriteLine(""+c);
-        Assert.Equal(3,c);
+        _outputHelper.WriteLine("");
     }
 }

@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace OrganizationBoard.Model
 {
-    public class Model1
+    public class Status
     {
-        
+        public int StatusId { get; set; }
+        public required string StatusName { get; set; }
     }
 }

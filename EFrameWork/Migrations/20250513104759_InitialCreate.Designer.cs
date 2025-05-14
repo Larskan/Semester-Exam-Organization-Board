@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EFrameWork.Migrations
 {
-    [DbContext(typeof(AGWDbContext))]
+    [DbContext(typeof(OBDbContext))]
     [Migration("20250513104759_InitialCreate")]
     partial class InitialCreate
     {

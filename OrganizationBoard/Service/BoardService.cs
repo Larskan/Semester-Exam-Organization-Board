@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace OrganizationBoard.Service
 {
-    public class Service1
+    public class BoardService
     {
         
     }
