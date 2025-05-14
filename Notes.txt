@@ -1,0 +1,13 @@
+FIXME: V01 - TA01 - Elevation: Member has access to Lead/Admin perms
+FIXME: V02 - TA01 - Spoof: Access to a team member
+FIXME: V03 - TA01 - Denial: DDoS
+FIXME: V04.1 - TA01 - Tamper/Denial: SQL Injection on Organization
+FIXME: V04.2 - TA01 - Tamper/Denial: SQl Injection on website
+FIXME: V05 - TA01 - Tamper: IDOR Attacks
+
+TODO: C01 - V01 - Proper Access Control - Added IsAdmin Check in AdminService.
+TODO: C02 - V02 - Proper Password, 2FA, Policies
+TODO: C03 - V03 - Monitoring Alert, Resource limiting
+TODO: C04 - V04 - Input Validation, Prepared Statements/Queries
+TODO: C05 - V04 - Input Validation, Prepared Statements/Queries
+TODO: C06 - V05 - Ensure no sensitive data is outputted in body/url

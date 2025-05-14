@@ -81,9 +81,9 @@ namespace EFramework.Data
             );
 
             modelBuilder.Entity<Role>().HasData(
-                new Role {RoleID = 1, RoleName = RoleStatus.Admin},
-                new Role {RoleID = 2, RoleName = RoleStatus.TeamLeader},
-                new Role {RoleID = 3, RoleName = RoleStatus.TeamMember}
+                new Role {RoleID = 1, RoleName = "Admin"},
+                new Role {RoleID = 2, RoleName = "Team Leader"},
+                new Role {RoleID = 3, RoleName = "Team Member"}
             );
 
             modelBuilder.Entity<User>().HasData(

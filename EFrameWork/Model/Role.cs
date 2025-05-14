@@ -14,17 +14,17 @@ namespace Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RoleID { get; set; }
         [Required]
-        public RoleStatus RoleName { get; set; }
+        public string RoleName { get; set; }
 
         public ICollection<User> Users { get; set; }
     }
 
-    public enum RoleStatus
-    {
-        Admin,
-        TeamLeader,
-        TeamMember
-    }
+    // public enum RoleStatus
+    // {
+    //     Admin,
+    //     TeamLeader,
+    //     TeamMember
+    // }
 
 }
 
