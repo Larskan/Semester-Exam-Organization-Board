@@ -22,6 +22,7 @@ namespace Model
         NotStarted,
         Ongoing,
         Done
+        // TODO: Need NotStarted -> Ongoing -> Done -> Confirmed
     }
 
 }
