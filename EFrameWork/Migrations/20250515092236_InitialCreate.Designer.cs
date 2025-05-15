@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFrameWork.Migrations
 {
     [DbContext(typeof(OBDbContext))]
-    [Migration("20250514134216_FixTables")]
-    partial class FixTables
+    [Migration("20250515092236_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,7 @@ namespace EFrameWork.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TeamID")
+                    b.Property<int?>("TeamID")
                         .HasColumnType("int");
 
                     b.HasKey("BoardID");
@@ -158,7 +158,7 @@ namespace EFrameWork.Migrations
                     b.Property<int>("RoleID")
                         .HasColumnType("int");
 
-                    b.Property<int>("TeamID")
+                    b.Property<int?>("TeamID")
                         .HasColumnType("int");
 
                     b.HasKey("UserID");
@@ -178,8 +178,7 @@ namespace EFrameWork.Migrations
                             Email = "Mail1",
                             OrganizationID = 1,
                             Password = "1234",
-                            RoleID = 1,
-                            TeamID = 1
+                            RoleID = 1
                         },
                         new
                         {
@@ -280,9 +279,7 @@ namespace EFrameWork.Migrations
                 {
                     b.HasOne("EFrameWork.Model.Team", "Team")
                         .WithMany("Boards")
-                        .HasForeignKey("TeamID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TeamID");
 
                     b.Navigation("Team");
                 });
@@ -322,9 +319,7 @@ namespace EFrameWork.Migrations
 
                     b.HasOne("EFrameWork.Model.Team", "Team")
                         .WithMany("Users")
-                        .HasForeignKey("TeamID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TeamID");
 
                     b.Navigation("Organization");
 
