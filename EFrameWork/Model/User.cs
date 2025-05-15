@@ -24,8 +24,7 @@ namespace EFrameWork.Model
         [ForeignKey("OrganizationID")]
         public Organization Organization { get; set; }
 
-        [Required]
-        public int TeamID { get; set; }
+        public int? TeamID { get; set; }
 
         [ForeignKey("TeamID")]
         public Team Team { get; set; }

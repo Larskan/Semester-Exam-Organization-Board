@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using EFramework.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,21 @@ var retryPolicy = Policy
 
 builder.Services.AddSingleton<IAsyncPolicy>(retryPolicy);
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("fixed", httpContext =>
+        RateLimitPartition.Get(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: key => new FixedWindowRateLimiter(
+                new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10, // Max 10 requests
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                    QueueLimit = 2
+                })));
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -53,7 +69,9 @@ if (app.Environment.IsDevelopment())
 //app.UseAuthentication();
 //app.UseAuthorization();
 
-app.MapControllers();
+app.UseRateLimiter();
+
+app.MapControllers().RequireRateLimiting("fixed");
 //app.UseHttpsRedirection();
 
 app.Run();
