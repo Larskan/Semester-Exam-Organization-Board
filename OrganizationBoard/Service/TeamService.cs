@@ -10,10 +10,163 @@ using OrganizationBoard.IService;
 
 namespace OrganizationBoard.Service
 {
-    public class TeamService //: ITeamService
+    public class TeamService : ITeamService
     {
+        private readonly OBDbContext _context;
+        public TeamService(OBDbContext context)
+        {
+            _context = context;
+        }
 
+        private async Task<bool> IsUserTeamLeader(int userId)
+        {
+            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
+            return user != null && user.RoleID == 2;
+        }
+        private async Task<bool> IsUserTeamMember(int userId, int teamId)
+        {
+            var team = await _context.TeamTables.FirstOrDefaultAsync(t => t.TeamID == teamId);
+            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
+            return user != null && user.TeamID == team.TeamID && team != null;
+        }
 
-        
+        public async Task<OperationResponse<Team>> CreateTeam(Team team, int requestingUserId)
+        {
+            if (!await IsUserTeamLeader(requestingUserId))
+                return new OperationResponse<Team>("Only team leaders can update teams.", false, 403);
+            
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == requestingUserId);
+            if (user == null)
+                return new OperationResponse<Team>("User not found", false, 404);
+
+            try{
+                var newTeam = new Team
+                {
+                    TeamName = team.TeamName,
+                    TeamID = (int)user.TeamID,
+                };
+                _context.TeamTables.Add(newTeam);
+                await _context.SaveChangesAsync();
+
+                return new OperationResponse<Team>(team, "Team created successfully.");
+            }
+            catch(Exception ex){
+                return new OperationResponse<Team>(ex.Message, false, 500);
+            }
+        }
+
+        public async Task<OperationResponse<Team>> UpdateTeam(Team team, int requestingUserId)
+        {
+
+            if (!await IsUserTeamLeader(requestingUserId))
+                return new OperationResponse<Team>("Only team leaders can update teams.", false, 403); 
+            
+            if (!await IsUserTeamMember(requestingUserId, team.TeamID))
+                return new OperationResponse<Team>("Only team leaders can update teams.", false, 403); 
+
+            try{
+                var existingTeam = _context.TeamTables!.FirstOrDefault(t => t.TeamID == team.TeamID);
+                if (existingTeam == null)
+                    return new OperationResponse<Team>("Team not found.", false, 404);
+
+                existingTeam.TeamName = team.TeamName;
+                await _context.SaveChangesAsync();
+                return new OperationResponse<Team>(team, "Team updated successfully.");
+            }
+            catch(Exception ex){
+                return new OperationResponse<Team>(ex.Message, false, 500);
+            }
+        }
+
+        public async Task<OperationResponse<bool>> DeleteTeam(int teamId, int requestingUserId)
+        {
+            if (!await IsUserTeamLeader(requestingUserId))
+                return new OperationResponse<bool>("Only team leaders can Delete teams.", false, 403); 
+
+            try{
+                var team = _context.TeamTables!.FirstOrDefault(t => t.TeamID == teamId);
+                if (team == null)
+                    return new OperationResponse<bool>("Team not found.", false, 404);
+                
+                _context.TeamTables!.Remove(team);
+                await _context.SaveChangesAsync();
+
+                return new OperationResponse<bool>(true, "Team deleted successfully.");
+
+            }
+            catch(Exception ex){
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }    
+        }
+
+        public async Task<OperationResponse<List<User>>> GetTeamMembers(int teamId, int requestingUserId)
+        {
+            if (!await IsUserTeamLeader(requestingUserId))
+                return new OperationResponse<List<User>>("Access Denied.", false, 403);
+
+            if (!await IsUserTeamMember(requestingUserId, teamId))
+                return new OperationResponse<List<User>>("Access Denied.", false, 403);
+
+            try{
+                var members = _context.UserTables!.Where(u => u.TeamID == teamId).ToList();
+                if (members == null || members.Count == 0)
+                    return new OperationResponse<List<User>>("No members found in this team.", false, 404);
+                
+                return new OperationResponse<List<User>>(members, "Members retrieved successfully.");
+            }
+            catch(Exception ex){
+                return new OperationResponse<List<User>>(ex.Message, false, 500);
+            }
+        }
+
+        public async Task<OperationResponse<bool>> AssignUserToTeam(int teamId, int userIdToAssign, int requestingLeaderId)
+        {
+            if (!await IsUserTeamLeader(requestingLeaderId))
+                return new OperationResponse<bool>("Access Denied.", false, 403);
+
+            try{
+                var team = await _context.TeamTables.Include(t => t.Users).FirstOrDefaultAsync(t => t.TeamID == teamId);
+                if (team == null)
+                    return new OperationResponse<bool>("No such team.", false, 404);
+                
+                var userToAssign = await _context.UserTables.FindAsync(userIdToAssign);
+                if (userToAssign == null)
+                    return new OperationResponse<bool>("No user found.", false, 404);
+                
+                team.Users.Add(userToAssign);
+                await _context.SaveChangesAsync();
+                return new OperationResponse<bool>(true, "User assigned to team successfully.");
+
+            }
+            catch(Exception ex){
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }
+        }
+
+        public async Task<OperationResponse<bool>> RemoveUserFromTeam(int teamId, int userIdToRemove, int requestingLeaderId)
+        {
+            if (!await IsUserTeamLeader(requestingLeaderId))
+                return new OperationResponse<bool>("Access Denied.", false, 403);
+
+            try{
+                var team = await _context.TeamTables.Include(t => t.Users).FirstOrDefaultAsync(t => t.TeamID == teamId);
+                if (team == null)
+                    return new OperationResponse<bool>("No such team.", false, 404);
+                
+                var userToAssign = await _context.UserTables.FindAsync(userIdToRemove);
+                if (userToAssign == null)
+                    return new OperationResponse<bool>("No user found.", false, 404);
+                
+                team.Users.Remove(userToAssign);
+                await _context.SaveChangesAsync();
+                return new OperationResponse<bool>(true, "User assigned to team successfully.");
+
+            }
+            catch(Exception ex){
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }
+        }
     }
+
+    
 }
