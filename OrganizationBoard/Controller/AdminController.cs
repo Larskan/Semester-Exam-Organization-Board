@@ -26,6 +26,6 @@ namespace OrganizationBoard.Controller
                 return StatusCode(response.StatusCode, response.Message);
             return Ok(response);
         }
-        
+
     }
 }

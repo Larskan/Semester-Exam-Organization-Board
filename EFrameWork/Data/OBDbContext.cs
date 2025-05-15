@@ -62,7 +62,7 @@ namespace EFramework.Data
             modelBuilder.Entity<UserToTask>()
                 .HasOne(ut => ut.User)
                 .WithMany(u => u.TaskAssignments)
-                .HasForeignKey(ut => ut.UserID) 
+                .HasForeignKey(ut => ut.UserID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserToTask>()
@@ -72,24 +72,24 @@ namespace EFramework.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Team>().HasData(
-                new Team {TeamID = 1, TeamName = "team 1"},
-                new Team {TeamID = 2, TeamName = "team 2"}
+                new Team { TeamID = 1, TeamName = "team 1" },
+                new Team { TeamID = 2, TeamName = "team 2" }
             );
 
             modelBuilder.Entity<Organization>().HasData(
-                new Organization{OrganizationID = 1, OrganizationName = "Lars"}
+                new Organization { OrganizationID = 1, OrganizationName = "Lars" }
             );
 
             modelBuilder.Entity<Role>().HasData(
-                new Role {RoleID = 1, RoleName = "Admin"},
-                new Role {RoleID = 2, RoleName = "Team Leader"},
-                new Role {RoleID = 3, RoleName = "Team Member"}
+                new Role { RoleID = 1, RoleName = "Admin" },
+                new Role { RoleID = 2, RoleName = "Team Leader" },
+                new Role { RoleID = 3, RoleName = "Team Member" }
             );
 
             modelBuilder.Entity<User>().HasData(
-                new User {UserID = 1, Email = "Mail1", Password = "1234", TeamID = 1, RoleID = 1, OrganizationID = 1},
-                new User {UserID = 2, Email = "Mail2", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1},
-                new User {UserID = 3, Email = "Mail3", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1}
+                new User { UserID = 1, Email = "Mail1", Password = "1234", TeamID = 1, RoleID = 1, OrganizationID = 1 },
+                new User { UserID = 2, Email = "Mail2", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1 },
+                new User { UserID = 3, Email = "Mail3", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1 }
             );
         }
     }

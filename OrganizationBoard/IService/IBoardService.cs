@@ -9,7 +9,7 @@ namespace OrganizationBoard.IService
     public interface IBoardService
     {
         // Task Management
-        Task<OperationResponse<EFrameWork.Model.Task>> CreateTask(EFrameWork.Model.Task task, int userId); // Only Team Leader
+        Task<OperationResponse<EFrameWork.Model.Task>> CreateTask(EFrameWork.Model.Task task, int boardId, int userId); // Only Team Leader
         Task<OperationResponse<EFrameWork.Model.Task>> GetTask(int taskId, int userId);  //Team Leader and Members
         Task<OperationResponse<EFrameWork.Model.Task>> UpdateTask(EFrameWork.Model.Task task, int userId); // Team Leader can update all, members can only update assigned to
         Task<OperationResponse<bool>> DeleteTask(int taskId, int userId); // Only Team Leader

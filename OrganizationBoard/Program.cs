@@ -1,6 +1,8 @@
 using EFramework.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using OrganizationBoard.IService;
+using OrganizationBoard.Service;
 using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //builder.Services.AddScoped<LoginServiceApi.Service.ILoginService, LoginServiceApi.Service.LoginService>();
-
+builder.Services.AddScoped<IBoardService, BoardService>();
 
 var configuration = builder.Configuration;
 builder.Services.AddDbContext<OBDbContext>(options =>

@@ -56,12 +56,18 @@ namespace OrganizationBoard.Service
             if (!await IsUserTeamLeader(requestingUserId))
                 return new OperationResponse<Board>("Access Denied", false, 403);
 
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == requestingUserId);
+            if (user == null)
+                return new OperationResponse<Board>("User not found", false, 404);
+
             try
             {
                 var newBoard = new Board
                 {
                     BoardName = board.BoardName,
-                    TeamID = board.TeamID
+                    TeamID = user.TeamID,
+                    Team = null,
+                    Tasks = new List<EFrameWork.Model.Task>(),
                 };
                 _context.BoardTables!.Add(newBoard);
                 await _context.SaveChangesAsync();
@@ -188,7 +194,7 @@ namespace OrganizationBoard.Service
         #endregion
 
         #region Task Management
-        public async Task<OperationResponse<EFrameWork.Model.Task>> CreateTask(EFrameWork.Model.Task task, int requestingUserId)
+        public async Task<OperationResponse<EFrameWork.Model.Task>> CreateTask(EFrameWork.Model.Task task, int boardId, int requestingUserId)
         {
             // Only Team Leaders can create tasks
             if (!await IsUserTeamLeader(requestingUserId))
@@ -200,7 +206,7 @@ namespace OrganizationBoard.Service
                 {
                     Title = task.Title,
                     Description = task.Description,
-                    BoardID = task.BoardID,
+                    BoardID = boardId,
                     Status = task.Status,
                     Estimation = task.Estimation,
                     NumUser = task.NumUser,
@@ -336,6 +342,7 @@ namespace OrganizationBoard.Service
         {
             if (!await IsUserTeamLeader(requestingUserId))
                 return new OperationResponse<bool>("Access Denied", false, 403);
+
             try
             {
                 var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
