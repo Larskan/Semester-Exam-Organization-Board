@@ -20,7 +20,6 @@ namespace EFrameWork.Model
         [ForeignKey("TeamID")]
         public Team? Team { get; set; }
 
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
-
+        public ICollection<Task>? Tasks { get; set; }
     }
 }

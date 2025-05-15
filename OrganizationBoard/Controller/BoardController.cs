@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrganizationBoard.IService;
+using OrganizationBoard.DTO;
 
 namespace OrganizationBoard.Controller
 {
@@ -46,7 +47,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpPost("CreateBoard")]
-        public async Task<IActionResult> CreateBoard([FromBody] EFrameWork.Model.Board board, int userId)
+        public async Task<IActionResult> CreateBoard([FromBody] BoardDto board, int userId)
         {
             var result = await _boardService.CreateBoard(board, userId);
             if (result.IsSuccess)
@@ -58,7 +59,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpPut("UpdateBoard")]
-        public async Task<IActionResult> UpdateBoard([FromBody] EFrameWork.Model.Board board, int userId)
+        public async Task<IActionResult> UpdateBoard([FromBody] BoardReadDto board, int userId)
         {
             var result = await _boardService.UpdateBoard(board, userId);
             if (result.IsSuccess)

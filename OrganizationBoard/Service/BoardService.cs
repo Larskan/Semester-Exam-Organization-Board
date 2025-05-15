@@ -50,15 +50,15 @@ namespace OrganizationBoard.Service
         #endregion
 
         #region Board Management
-        public async Task<OperationResponse<Board>> CreateBoard(Board board, int requestingUserId)
+        public async Task<OperationResponse<BoardDto>> CreateBoard(BoardDto board, int requestingUserId)
         {
             // Only Team Leaders can create boards
             if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<Board>("Access Denied", false, 403);
+                return new OperationResponse<BoardDto>("Access Denied", false, 403);
 
             var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == requestingUserId);
             if (user == null)
-                return new OperationResponse<Board>("User not found", false, 404);
+                return new OperationResponse<BoardDto>("User not found", false, 404);
 
             try
             {
@@ -66,62 +66,73 @@ namespace OrganizationBoard.Service
                 {
                     BoardName = board.BoardName,
                     TeamID = user.TeamID,
-                    Team = null,
-                    Tasks = new List<EFrameWork.Model.Task>(),
                 };
                 _context.BoardTables!.Add(newBoard);
                 await _context.SaveChangesAsync();
 
-                return new OperationResponse<Board>(board, "Board created successfully");
+                board.BoardID = newBoard.BoardID;
+
+                return new OperationResponse<BoardDto>(board, "Board created successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<Board>(ex.Message, false, 500);
+                return new OperationResponse<BoardDto>(ex.Message, false, 500);
             }
         }
 
-        public async Task<OperationResponse<List<EFrameWork.Model.Task>>> GetBoardTasks(int boardId, int requestingUserId)
+        public async Task<OperationResponse<List<TaskReadDto>>> GetBoardTasks(int boardId, int requestingUserId)
         {
 
             if (!await IsUserTeamMember(requestingUserId, boardId))
-                return new OperationResponse<List<EFrameWork.Model.Task>>("Access Denied", false, 403);
+                return new OperationResponse<List<TaskReadDto>>("Access Denied", false, 403);
 
             try
             {
                 var tasks = _context.TaskTables!.Where(t => t.BoardID == boardId).ToList();
                 if (tasks == null || tasks.Count == 0)
-                    return new OperationResponse<List<EFrameWork.Model.Task>>("No tasks found", false, 404);
+                    return new OperationResponse<List<TaskReadDto>>("No tasks found", false, 404);
 
-                return new OperationResponse<List<EFrameWork.Model.Task>>(tasks, "Tasks retrieved successfully");
+                var taskDtos = tasks.Select(t => new TaskReadDto
+                {
+                    TaskID = t.TaskID,
+                    Title = t.Title,
+                    Description = t.Description,
+                    Estimation = t.Estimation,
+                    NumUser = t.NumUser,
+                    StatusID = t.StatusID,
+                    BoardID = t.BoardID,
+                }).ToList();
+
+                return new OperationResponse<List<TaskReadDto>>(taskDtos, "Tasks retrieved successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<List<EFrameWork.Model.Task>>(ex.Message, false, 500);
+                return new OperationResponse<List<TaskReadDto>>(ex.Message, false, 500);
             }
         }
 
-        public async Task<OperationResponse<Board>> UpdateBoard(Board board, int requestingUserId)
+        public async Task<OperationResponse<BoardReadDto>> UpdateBoard(BoardReadDto board, int requestingUserId)
         {
-
-            if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<Board>("Access Denied", false, 403);
-
-            if (!await IsUserTeamMember(requestingUserId, board.BoardID))
-                return new OperationResponse<Board>("Access Denied", false, 403);
 
             try
             {
                 var existingBoard = _context.BoardTables!.FirstOrDefault(b => b.BoardID == board.BoardID);
                 if (existingBoard == null)
-                    return new OperationResponse<Board>("Board not found", false, 404);
+                    return new OperationResponse<BoardReadDto>("Board not found", false, 404);
+
+                if (!await IsUserTeamLeader(requestingUserId))
+                    return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
+
+                if (!await IsUserTeamMember(requestingUserId, board.BoardID))
+                    return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
 
                 existingBoard.BoardName = board.BoardName;
                 _context.SaveChanges();
-                return new OperationResponse<Board>(board, "Board updated successfully");
+                return new OperationResponse<BoardReadDto>(board, "Board updated successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<Board>(ex.Message, false, 500);
+                return new OperationResponse<BoardReadDto>(ex.Message, false, 500);
             }
 
         }
@@ -129,17 +140,18 @@ namespace OrganizationBoard.Service
         public async Task<OperationResponse<bool>> DeleteBoard(int boardId, int requestingUserId)
         {
 
-            if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<bool>("Access Denied", false, 403);
-
-            if (!await IsUserTeamMember(requestingUserId, boardId))
-                return new OperationResponse<bool>("Access Denied", false, 403);
-
             try
             {
                 var board = _context.BoardTables!.FirstOrDefault(b => b.BoardID == boardId);
                 if (board == null)
                     return new OperationResponse<bool>("Board not found", false, 404);
+
+                if (!await IsUserTeamLeader(requestingUserId))
+                    return new OperationResponse<bool>("Access Denied", false, 403);
+
+                if (!await IsUserTeamMember(requestingUserId, boardId))
+                    return new OperationResponse<bool>("Access Denied", false, 403);
+
 
                 _context.BoardTables.Remove(board);
                 await _context.SaveChangesAsync();
@@ -152,53 +164,67 @@ namespace OrganizationBoard.Service
             }
         }
 
-        public async Task<OperationResponse<Board>> GetBoard(int boardId, int requestingUserId)
+        public async Task<OperationResponse<BoardReadDto>> GetBoard(int boardId, int requestingUserId)
         {
 
             if (!await IsUserTeamMember(requestingUserId, boardId))
-                return new OperationResponse<Board>("Access Denied", false, 403);
+                return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
 
             try
             {
                 var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
                 if (board == null)
-                    return new OperationResponse<Board>("Board not found", false, 404);
+                    return new OperationResponse<BoardReadDto>("Board not found", false, 404);
 
-                return new OperationResponse<Board>(board, "Board retrieved successfully");
+                var boardDto = new BoardReadDto
+                {
+                    BoardID = board.BoardID,
+                    BoardName = board.BoardName,
+                    TeamID = board.TeamID
+                };
+
+                return new OperationResponse<BoardReadDto>(boardDto, "Board retrieved successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<Board>(ex.Message, false, 500);
+                return new OperationResponse<BoardReadDto>(ex.Message, false, 500);
             }
         }
 
-        public async Task<OperationResponse<List<Board>>> GetTeamBoards(int teamId, int requestingUserId)
+        public async Task<OperationResponse<List<BoardReadDto>>> GetTeamBoards(int teamId, int requestingUserId)
         {
             if (!await IsUserInTeam(requestingUserId, teamId))
-                return new OperationResponse<List<Board>>("Access Denied", false, 403);
+                return new OperationResponse<List<BoardReadDto>>("Access Denied", false, 403);
 
             try
             {
                 var boards = await _context.BoardTables!.Where(b => b.TeamID == teamId).ToListAsync();
                 if (boards == null || boards.Count == 0)
-                    return new OperationResponse<List<Board>>("No boards found", false, 404);
+                    return new OperationResponse<List<BoardReadDto>>("No boards found", false, 404);
 
-                return new OperationResponse<List<Board>>(boards, "Boards retrieved successfully");
+                var boardDtos = boards.Select(b => new BoardReadDto
+                {
+                    BoardID = b.BoardID,
+                    BoardName = b.BoardName,
+                    TeamID = b.TeamID
+                }).ToList();
+
+                return new OperationResponse<List<BoardReadDto>>(boardDtos, "Boards retrieved successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<List<Board>>(ex.Message, false, 500);
+                return new OperationResponse<List<BoardReadDto>>(ex.Message, false, 500);
             }
         }
 
         #endregion
 
         #region Task Management
-        public async Task<OperationResponse<EFrameWork.Model.Task>> CreateTask(EFrameWork.Model.Task task, int boardId, int requestingUserId)
+        public async Task<OperationResponse<TaskDto>> CreateTask(TaskDto task, int boardId, int requestingUserId)
         {
             // Only Team Leaders can create tasks
             if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<EFrameWork.Model.Task>("Access Denied", false, 403);
+                return new OperationResponse<TaskDto>("Access Denied", false, 403);
 
             try
             {
@@ -207,49 +233,62 @@ namespace OrganizationBoard.Service
                     Title = task.Title,
                     Description = task.Description,
                     BoardID = boardId,
-                    Status = task.Status,
+                    StatusID = 1,
                     Estimation = task.Estimation,
                     NumUser = task.NumUser,
                 };
                 _context.TaskTables!.Add(newTask);
                 await _context.SaveChangesAsync();
 
-                return new OperationResponse<EFrameWork.Model.Task>(task, "Task created successfully");
+                newTask.TaskID = newTask.TaskID;
+
+                return new OperationResponse<TaskDto>(task, "Task created successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<EFrameWork.Model.Task>(ex.Message, false, 500);
+                return new OperationResponse<TaskDto>(ex.Message, false, 500);
             }
         }
 
-        public async Task<OperationResponse<EFrameWork.Model.Task>> GetTask(int taskId, int requestingUserId)
+        public async Task<OperationResponse<TaskReadDto>> GetTask(int taskId, int requestingUserId)
         {
 
             try
             {
                 var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
                 if (task == null)
-                    return new OperationResponse<EFrameWork.Model.Task>("Task not found", false, 404);
+                    return new OperationResponse<TaskReadDto>("Task not found", false, 404);
 
-                return new OperationResponse<EFrameWork.Model.Task>(task, "Task retrieved successfully");
+                var taskDto = new TaskReadDto
+                {
+                    TaskID = task.TaskID,
+                    Title = task.Title,
+                    Description = task.Description,
+                    Estimation = task.Estimation,
+                    NumUser = task.NumUser,
+                    StatusID = task.StatusID,
+                };
+
+                return new OperationResponse<TaskReadDto>(taskDto, "Task retrieved successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<EFrameWork.Model.Task>(ex.Message, false, 500);
+                return new OperationResponse<TaskReadDto>(ex.Message, false, 500);
             }
         }
 
-        public async Task<OperationResponse<EFrameWork.Model.Task>> UpdateTask(EFrameWork.Model.Task task, int requestingUserId)
+        public async Task<OperationResponse<TaskReadDto>> UpdateTask(TaskReadDto task, int requestingUserId)
         {
             try
             {
                 // Only Team Leaders can update tasks
                 if (!await IsUserTeamLeader(requestingUserId))
-                    return new OperationResponse<EFrameWork.Model.Task>("Access Denied", false, 403);
+                    return new OperationResponse<TaskReadDto>("Access Denied", false, 403);
 
                 var existingTask = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == task.TaskID);
                 if (existingTask == null)
-                    return new OperationResponse<EFrameWork.Model.Task>("Task not found", false, 404);
+                    return new OperationResponse<TaskReadDto>("Task not found", false, 404);
+
 
                 existingTask.Title = task.Title;
                 existingTask.Description = task.Description;
@@ -258,11 +297,21 @@ namespace OrganizationBoard.Service
 
                 await _context.SaveChangesAsync();
 
-                return new OperationResponse<EFrameWork.Model.Task>(existingTask, "Task updated successfully");
+                var updatedTaskDto = new TaskReadDto
+                {
+                    TaskID = existingTask.TaskID,
+                    Title = existingTask.Title,
+                    Description = existingTask.Description,
+                    Estimation = existingTask.Estimation,
+                    NumUser = existingTask.NumUser,
+                    StatusID = existingTask.StatusID,
+                };
+
+                return new OperationResponse<TaskReadDto>(updatedTaskDto, "Task updated successfully");
             }
             catch (System.Exception ex)
             {
-                return new OperationResponse<EFrameWork.Model.Task>(ex.Message, false, 500);
+                return new OperationResponse<TaskReadDto>(ex.Message, false, 500);
             }
         }
 
