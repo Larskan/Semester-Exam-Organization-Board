@@ -30,6 +30,6 @@ namespace EFrameWork.Model
         public float? Estimation { get; set; }
         public float? NumUser { get; set; }
 
-        public ICollection<UserToTask>? UserAssignments { get; set; }
+        public ICollection<UserToTask>? UserAssignments { get; set; } = new HashSet<UserToTask>();
     }
 }

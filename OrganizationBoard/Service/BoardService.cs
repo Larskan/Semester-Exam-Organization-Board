@@ -8,6 +8,7 @@ using EFramework.Data;
 using OrganizationBoard.IService;
 using EFrameWork.Model;
 
+
 namespace OrganizationBoard.Service
 {
     public class BoardService : IBoardService
@@ -26,26 +27,26 @@ namespace OrganizationBoard.Service
         // }
         private async Task<bool> IsUserInTeam(int userId, int teamId)
         {
-            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
             return user != null && user.TeamID == teamId;
         }
 
         private async Task<bool> IsUserTeamLeader(int userId)
         {
-            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
             return user != null && user.RoleID == 2;
         }
         private async Task<bool> IsUserTeamMember(int userId, int boardId)
         {
-            var board = await _context.BoardTables.FirstOrDefaultAsync(b => b.BoardID == boardId);
-            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
-            return user != null && user.TeamID == board.TeamID && board != null;
+            var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
+            return user != null && user.TeamID == board!.TeamID && board != null;
         }
 
         private async Task<bool> IsUserInTask(int userId, int taskId)
         {
-            var task = await _context.TaskTables.FirstOrDefaultAsync(t => t.TaskID == taskId);
-            return task != null && task.UserAssignments.Any(ua => ua.UserID == userId);
+            var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
+            return task != null && task.UserAssignments!.Any(ua => ua.UserID == userId);
         }
         #endregion
 
@@ -126,6 +127,7 @@ namespace OrganizationBoard.Service
                 if (!await IsUserTeamMember(requestingUserId, board.BoardID))
                     return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
 
+
                 existingBoard.BoardName = board.BoardName;
                 _context.SaveChanges();
                 return new OperationResponse<BoardReadDto>(board, "Board updated successfully");
@@ -152,8 +154,11 @@ namespace OrganizationBoard.Service
                 if (!await IsUserTeamMember(requestingUserId, boardId))
                     return new OperationResponse<bool>("Access Denied", false, 403);
 
+                // Check if the board has any tasks
+                if (_context.TaskTables!.Any(t => t.BoardID == boardId))
+                    _context.TaskTables!.RemoveRange(_context.TaskTables.Where(t => t.BoardID == boardId));
 
-                _context.BoardTables.Remove(board);
+                _context.BoardTables!.Remove(board);
                 await _context.SaveChangesAsync();
 
                 return new OperationResponse<bool>(true, "Board deleted successfully");
@@ -167,14 +172,15 @@ namespace OrganizationBoard.Service
         public async Task<OperationResponse<BoardReadDto>> GetBoard(int boardId, int requestingUserId)
         {
 
-            if (!await IsUserTeamMember(requestingUserId, boardId))
-                return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
 
             try
             {
                 var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
-                if (board == null)
+                if (board == null || board.TeamID == null)
                     return new OperationResponse<BoardReadDto>("Board not found", false, 404);
+
+                if (!await IsUserTeamMember(requestingUserId, boardId))
+                    return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
 
                 var boardDto = new BoardReadDto
                 {
@@ -209,7 +215,7 @@ namespace OrganizationBoard.Service
                     TeamID = b.TeamID
                 }).ToList();
 
-                return new OperationResponse<List<BoardReadDto>>(boardDtos, "Boards retrieved successfully");
+                return new OperationResponse<List<BoardReadDto>>(boardDtos);
             }
             catch (System.Exception ex)
             {
@@ -240,7 +246,7 @@ namespace OrganizationBoard.Service
                 _context.TaskTables!.Add(newTask);
                 await _context.SaveChangesAsync();
 
-                newTask.TaskID = newTask.TaskID;
+                task.TaskID = newTask.TaskID;
 
                 return new OperationResponse<TaskDto>(task, "Task created successfully");
             }
@@ -327,7 +333,7 @@ namespace OrganizationBoard.Service
                 if (task == null)
                     return new OperationResponse<bool>("Task not found", false, 404);
 
-                _context.TaskTables.Remove(task);
+                _context.TaskTables!.Remove(task);
                 _context.SaveChanges();
 
                 return new OperationResponse<bool>(true, "Task deleted successfully");
@@ -353,7 +359,13 @@ namespace OrganizationBoard.Service
                 if (user == null)
                     return new OperationResponse<bool>("User not found", false, 404);
 
-                task.UserAssignments.Add(new UserToTask { UserID = assignedToUserId, TaskID = taskId });
+                var newAssignment = new UserToTask
+                {
+                    UserID = assignedToUserId,
+                    TaskID = taskId
+                };
+
+                task.UserAssignments!.Add(newAssignment);
                 await _context.SaveChangesAsync();
 
                 return new OperationResponse<bool>(true, "Task assigned successfully");
@@ -364,6 +376,7 @@ namespace OrganizationBoard.Service
             }
         }
 
+        //TODO: Check if the user is a member of the team not working correctly
         public async Task<OperationResponse<bool>> MarkTaskAsComplete(int taskId, int requestingUserId)
         {
             try

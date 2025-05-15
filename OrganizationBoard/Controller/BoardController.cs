@@ -81,6 +81,100 @@ namespace OrganizationBoard.Controller
             return BadRequest(result.Message);
         }
 
+        [HttpGet("GetBoardTasks/{boardId}")]
+        public async Task<IActionResult> GetBoardTasks(int boardId, int userId)
+        {
+            var result = await _boardService.GetBoardTasks(boardId, userId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return NotFound(result.Message);
+        }
+
+        #endregion
+
+        #region Task Management
+
+        // [Authorize(Roles = "Team Leader")]
+        [HttpPost("CreateTask")]
+        public async Task<IActionResult> CreateTask([FromBody] TaskDto task, int boardId, int userId)
+        {
+            var result = await _boardService.CreateTask(task, boardId, userId);
+            if (result.IsSuccess)
+            {
+                return CreatedAtAction(nameof(GetTask), new { taskId = result.Data.TaskID }, result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+
+        [HttpGet("GetTask/{taskId}")]
+        public async Task<IActionResult> GetTask(int taskId, int userId)
+        {
+            var result = await _boardService.GetTask(taskId, userId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return NotFound(result.Message);
+        }
+
+        // [Authorize(Roles = "Team Leader")]
+        [HttpPut("UpdateTask")]
+        public async Task<IActionResult> UpdateTask([FromBody] TaskReadDto task, int userId)
+        {
+            var result = await _boardService.UpdateTask(task, userId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+
+        // [Authorize(Roles = "Team Leader")]
+        [HttpDelete("DeleteTask/{taskId}")]
+        public async Task<IActionResult> DeleteTask(int taskId, int userId)
+        {
+            var result = await _boardService.DeleteTask(taskId, userId);
+            if (result.IsSuccess)
+            {
+                return NoContent();
+            }
+            return BadRequest(result.Message);
+        }
+
+        [HttpPost("AssignTask/{taskId}/{assignedToUserId}")]
+        public async Task<IActionResult> AssignTask(int taskId, int userId, int assignedToUserId)
+        {
+            var result = await _boardService.AssignTask(taskId, userId, assignedToUserId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+
+        [HttpPost("MarkTaskAsComplete/{taskId}")]
+        public async Task<IActionResult> MarkTaskAsComplete(int taskId, int userId)
+        {
+            var result = await _boardService.MarkTaskAsComplete(taskId, userId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+        [HttpPost("ConfirmTaskCompletion/{taskId}")]
+        public async Task<IActionResult> ConfirmTaskCompletion(int taskId, int userId)
+        {
+            var result = await _boardService.ConfirmTaskCompletion(taskId, userId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.Message);
+        }
+
         #endregion
     }
 }
