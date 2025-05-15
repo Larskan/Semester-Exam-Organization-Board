@@ -87,9 +87,15 @@ namespace EFramework.Data
             );
 
             modelBuilder.Entity<User>().HasData(
+<<<<<<< HEAD
                 new User { UserID = 1, Email = "Mail1", Password = "1234", TeamID = 1, RoleID = 1, OrganizationID = 1 },
                 new User { UserID = 2, Email = "Mail2", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1 },
                 new User { UserID = 3, Email = "Mail3", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1 }
+=======
+                new User {UserID = 1, Email = "Mail1", Password = "1234", RoleID = 1, OrganizationID = 1},
+                new User {UserID = 2, Email = "Mail2", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1},
+                new User {UserID = 3, Email = "Mail3", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1}
+>>>>>>> 0b5e9ead5066def673f81cd42c143fb250a4f860
             );
         }
     }
