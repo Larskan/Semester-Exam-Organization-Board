@@ -71,7 +71,7 @@ namespace EFrameWork.Migrations
                     BoardID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BoardName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TeamID = table.Column<int>(type: "int", nullable: false)
+                    TeamID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -80,8 +80,7 @@ namespace EFrameWork.Migrations
                         name: "FK_BoardTables_TeamTables_TeamID",
                         column: x => x.TeamID,
                         principalTable: "TeamTables",
-                        principalColumn: "TeamID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "TeamID");
                 });
 
             migrationBuilder.CreateTable(
@@ -92,7 +91,7 @@ namespace EFrameWork.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoleID = table.Column<int>(type: "int", nullable: false),
                     OrganizationID = table.Column<int>(type: "int", nullable: false),
-                    TeamID = table.Column<int>(type: "int", nullable: false),
+                    TeamID = table.Column<int>(type: "int", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -115,8 +114,7 @@ namespace EFrameWork.Migrations
                         name: "FK_UserTables_TeamTables_TeamID",
                         column: x => x.TeamID,
                         principalTable: "TeamTables",
-                        principalColumn: "TeamID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "TeamID");
                 });
 
             migrationBuilder.CreateTable(
@@ -186,7 +184,7 @@ namespace EFrameWork.Migrations
                 values: new object[,]
                 {
                     { 1, "Admin" },
-                    { 2, "Team Lead" },
+                    { 2, "Team Leader" },
                     { 3, "Team Member" }
                 });
 
@@ -204,9 +202,9 @@ namespace EFrameWork.Migrations
                 columns: new[] { "UserID", "Email", "OrganizationID", "Password", "RoleID", "TeamID" },
                 values: new object[,]
                 {
-                    { 1, "Mail1", 1, "1234", 1, 1 },
-                    { 2, "Mail1", 1, "1234", 2, 2 },
-                    { 3, "Mail1", 1, "1234", 3, 1 }
+                    { 1, "Mail1", 1, "1234", 1, null },
+                    { 2, "Mail2", 1, "1234", 2, 2 },
+                    { 3, "Mail3", 1, "1234", 3, 1 }
                 });
 
             migrationBuilder.CreateIndex(

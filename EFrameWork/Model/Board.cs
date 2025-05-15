@@ -14,13 +14,11 @@ namespace EFrameWork.Model
         public int BoardID { get; set; }
         [Required]
         public string BoardName { get; set; }
-
-        [Required]
-        public int TeamID { get; set; }
+        public int? TeamID { get; set; }
         [ForeignKey("TeamID")]
         public Team Team { get; set; }
         
-        public ICollection<Task> Tasks { get; set; }
+        public ICollection<Task>? Tasks { get; set; }
 
     }
 }
