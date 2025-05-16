@@ -35,6 +35,6 @@ namespace EFrameWork.Model
         [Required]
         public string Password { get; set; }
 
-        public ICollection<UserToTask> TaskAssignments { get; set; }
+        public ICollection<UserToTask>? TaskAssignments { get; set; }
     }
 }
