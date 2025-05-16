@@ -1,14 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using OrganizationBoard.IService;
 
 namespace OrganizationBoard.Service;
-
-public interface IRsaService
-{
-    string GetPublicKey();
-    string Decrypt(string encryptedData);
-}
 
 public class RsaService : IRsaService
 {
