@@ -40,7 +40,11 @@ namespace OrganizationBoard.Service
         {
             var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
             var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
-            return user != null && user.TeamID == board!.TeamID && board != null;
+
+            if (board == null || user == null)
+                return false;
+
+            return user.TeamID == board.TeamID;
         }
 
         private async Task<bool> IsUserInTask(int userId, int taskId)
