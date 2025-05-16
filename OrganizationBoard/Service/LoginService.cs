@@ -16,11 +16,13 @@ namespace OrganizationBoard.Service
     {
         private readonly OBDbContext _db;
         private readonly IBCryptService _bCryptService;
+        private readonly IRsaService _rsaService;
 
-        public LoginService(OBDbContext db, IBCryptService bCryptService)
+        public LoginService(OBDbContext db, IBCryptService bCryptService, IRsaService rsaService)
         {
             _db = db;
             _bCryptService = bCryptService;
+            _rsaService = rsaService;
         }
         public async Task<User> UserCheck(LoginDto dto)
         {
@@ -36,8 +38,9 @@ namespace OrganizationBoard.Service
                 }
 
                 // TODO: Decrypt Password
+                var decryptPassword = _rsaService.Decrypt(user.Password);
 
-                bool valid = _bCryptService.VerifyPassword(dto.Password, user.Password);
+                bool valid = _bCryptService.VerifyPassword(dto.Password, decryptPassword);
 
                 if (!valid)
                 {

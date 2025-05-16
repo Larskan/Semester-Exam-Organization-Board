@@ -7,35 +7,18 @@ namespace OrganizationBoard.Service;
 
 public class RsaService : IRsaService
 {
-    private readonly IConfiguration _configuration;
     private readonly RSA _rsa;
 
-    public RsaService(IConfiguration configuration)
+    public RsaService()
     {
-        _configuration = configuration;
         _rsa = RSA.Create();
-        
-        // Load or generate keys
-        var privateKey = _configuration["PubPrv:Prv"];
-        if (string.IsNullOrEmpty(privateKey) || privateKey == "Prv Key")
-        {
-            // Generate new keys if they don't exist
-            var keys = GenerateRsaKeys();
-            _rsa.ImportFromPem(keys.privateKey);
-            
-            // Update appsettings.json with new keys
-            UpdateAppSettings(keys.publicKey, keys.privateKey);
-        }
-        else
-        {
-            // Load existing private key
-            _rsa.ImportFromPem(privateKey);
-        }
+        var keys = GenerateRsaKeys();
+        _rsa.ImportFromPem(keys.privateKey);
     }
 
     public string GetPublicKey()
     {
-        return _configuration["PubPrv:Pub"];
+        return _rsa.ExportSubjectPublicKeyInfoPem();
     }
 
     public string Decrypt(string encryptedData)
@@ -43,6 +26,23 @@ public class RsaService : IRsaService
         var encryptedBytes = Convert.FromBase64String(encryptedData);
         var decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.OaepSHA256);
         return Encoding.UTF8.GetString(decryptedBytes);
+    }
+    public string EncryptInternal(string RawData)
+    {
+        try
+        {
+            var bytesToEncrypt = Encoding.UTF8.GetBytes(RawData);
+            var encryptedBytes = _rsa.Encrypt(bytesToEncrypt, RSAEncryptionPadding.OaepSHA256);
+            return Convert.ToBase64String(encryptedBytes);
+        }
+        catch (CryptographicException ex)
+        {
+            throw new InvalidOperationException("Encryption failed. Data might be too large or padding incorrect.", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred during encryption.", ex);
+        }
     }
 
     private (string publicKey, string privateKey) GenerateRsaKeys()
@@ -52,17 +52,24 @@ public class RsaService : IRsaService
         var privateKey = rsa.ExportRSAPrivateKeyPem();
         return (publicKey, privateKey);
     }
-
-    private void UpdateAppSettings(string publicKey, string privateKey)
+    
+    public string EncryptOutside(string RawData, string publicKeyPem)
     {
-        var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
-        var json = File.ReadAllText(appSettingsPath);
-        dynamic config = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-        
-        config.PubPrv.Pub = publicKey;
-        config.PubPrv.Prv = privateKey;
-        
-        var updatedJson = Newtonsoft.Json.JsonConvert.SerializeObject(config, Newtonsoft.Json.Formatting.Indented);
-        File.WriteAllText(appSettingsPath, updatedJson);
+        try
+        {
+            var rsaDectypt = RSA.Create();
+            rsaDectypt.ImportFromPem(publicKeyPem);
+            var bytesToEncrypt = Encoding.UTF8.GetBytes(RawData);
+            var encryptedBytes = rsaDectypt.Encrypt(bytesToEncrypt, RSAEncryptionPadding.OaepSHA256);
+            return Convert.ToBase64String(encryptedBytes);
+        }
+        catch (CryptographicException ex)
+        {
+            throw new InvalidOperationException("Encryption failed. Data might be too large or padding incorrect.", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred during encryption.", ex);
+        }
     }
 } 

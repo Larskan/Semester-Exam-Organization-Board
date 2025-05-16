@@ -46,13 +46,13 @@ public class LoginController : ControllerBase
 
             var token = _tokenCreation.CreateToken(user);
 
-            if(token == null)
+            if (token == null)
                 return Unauthorized("Invalid token credentials");
 
             return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token)
-                });
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token)
+            });
         }
         catch (UnauthorizedAccessException)
         {
@@ -95,9 +95,18 @@ public class LoginController : ControllerBase
     }
 
     [HttpGet("public-key")]
+    [AllowAnonymous]
     public IActionResult GetPublicKey()
     {
         var publicKey = _rsaService.GetPublicKey();
         return Ok(new { publicKey });
+    }
+    
+    [HttpGet("EncryptPasswordBummyForWebsideResponsabilety")]
+    [AllowAnonymous]
+    public IActionResult EncryptPasswordBummyForWebsideResponsabilety(string password, string publicKeyPem)
+    {
+        var Encrypted = _rsaService.EncryptOutside(password,publicKeyPem);
+        return Ok(new { Encrypted });
     }
 }
