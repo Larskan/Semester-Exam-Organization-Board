@@ -12,83 +12,92 @@ using Microsoft.IdentityModel.Tokens;
 using OrganizationBoard.DTO;
 using OrganizationBoard.IService;
 using Polly;
+using OrganizationBoard.Service;
 
-namespace OrganizationBoard.Controller
+namespace OrganizationBoard.Controller;
+
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class LoginController : ControllerBase
 {
-    [Authorize]
-    [ApiController]
-    [Route("api/[controller]")]
-    public class LoginController : ControllerBase
+    private readonly ILoginService _loginService;
+    private readonly IAsyncPolicy _retryPolicy;
+    private readonly ITokenCreation _tokenCreation;
+    private readonly IRsaService _rsaService;
+
+    public LoginController(ILoginService loginService, IAsyncPolicy retryPolicy, ITokenCreation tokenCreation, IRsaService rsaService)
     {
-        private readonly ILoginService _loginService;
-        private readonly IAsyncPolicy _retryPolicy;
-        private readonly ITokenCreation _tokenCreation;
+        _loginService = loginService;
+        _retryPolicy = retryPolicy;
+        _tokenCreation = tokenCreation;
+        _rsaService = rsaService;
+    }
 
-        public LoginController(ILoginService loginService, IAsyncPolicy retryPolicy, ITokenCreation tokenCreation)
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
+    {
+        try
         {
-            _loginService = loginService;
-            _retryPolicy = retryPolicy;
-            _tokenCreation = tokenCreation;
-        }
+            var user = await _retryPolicy.ExecuteAsync(() => _loginService.UserCheck(dto));
+            if (user == null)
+                return Unauthorized("Invalid credentials");
 
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
+            var token = _tokenCreation.CreateToken(user);
+
+            if(token == null)
+                return Unauthorized("Invalid token credentials");
+
+            return Ok(new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(token)
+                });
+        }
+        catch (UnauthorizedAccessException)
         {
-            try
-            {
-                var user = await _retryPolicy.ExecuteAsync(() => _loginService.UserCheck(dto));
-                if (user == null)
-                    return Unauthorized("Invalid credentials");
-
-                var token = _tokenCreation.CreateToken(user);
-
-                if(token == null)
-                    return Unauthorized("Invalid token credentials");
-
-                return Ok(new
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(token)
-                    });
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized("Invalid email or password.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Login failed: {ex.Message}");
-            }
+            return Unauthorized("Invalid email or password.");
         }
-
-        [HttpPost("AccountAndOrgCreation")]
-        [AllowAnonymous]
-        public async Task<IActionResult> CreateAccountAndOrg([FromBody] AccountAndOrgDto dto)
+        catch (Exception ex)
         {
-            try
-            {
-                await _retryPolicy.ExecuteAsync(() => _loginService.CreateAccountAndOrg(dto));
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Login failed: {ex.Message}");
-            }
+            return StatusCode(500, $"Login failed: {ex.Message}");
         }
+    }
 
-        [HttpPost]
-        [Authorize(Roles = "Team Member,Admin")]
-        public IActionResult CreateTask()
+    [HttpPost("AccountAndOrgCreation")]
+    [AllowAnonymous]
+    public async Task<IActionResult> CreateAccountAndOrg([FromBody] AccountAndOrgDto dto)
+    {
+        try
         {
-            return Ok("Task created by Team Member!");
-        }
+            await _retryPolicy.ExecuteAsync(() => _loginService.CreateAccountAndOrg(dto));
 
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public IActionResult GetAdminData()
-        {
-            return Ok("Only admins see this.");
+            return Ok();
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Login failed: {ex.Message}");
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Team Member,Admin")]
+    public IActionResult CreateTask()
+    {
+        return Ok("Task created by Team Member!");
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
+    public IActionResult GetAdminData()
+    {
+        return Ok("Only admins see this.");
+    }
+
+    [HttpGet("public-key")]
+    public IActionResult GetPublicKey()
+    {
+        var publicKey = _rsaService.GetPublicKey();
+        return Ok(new { publicKey });
     }
 }

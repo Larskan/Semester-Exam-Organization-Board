@@ -52,6 +52,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenCreation, TokenCreation>();
 builder.Services.AddScoped<IBCryptService, BCryptService>();
+builder.Services.AddSingleton<IRsaService, RsaService>();
 
 
 var configuration = builder.Configuration;
