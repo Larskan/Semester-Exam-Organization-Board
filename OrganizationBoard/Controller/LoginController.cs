@@ -81,14 +81,14 @@ public class LoginController : ControllerBase
         }
     }
 
-    [HttpPost]
+    [HttpPost("Team Member and Admin")]
     [Authorize(Roles = "Team Member,Admin")]
     public IActionResult CreateTask()
     {
         return Ok("Task created by Team Member!");
     }
 
-    [HttpGet]
+    [HttpGet("AdminOnly")]
     [Authorize(Roles = "Admin")]
     public IActionResult GetAdminData()
     {
@@ -109,15 +109,5 @@ public class LoginController : ControllerBase
     {
         var Encrypted = _rsaService.EncryptOutside(password, publicKeyPem);
         return Ok(new { Encrypted });
-    }
-    
-    [HttpGet("testPem")]
-    [AllowAnonymous]
-    public IActionResult testPem(string publicKeyPem)
-    {
-            using var sha256 = SHA256.Create();
-        var bytes = Encoding.UTF8.GetBytes(publicKeyPem.Replace("\\n", "\n"));
-        var return1 = Convert.ToBase64String(sha256.ComputeHash(bytes));
-        return Ok(new { return1 });
     }
 }
