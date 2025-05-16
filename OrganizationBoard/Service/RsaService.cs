@@ -24,6 +24,8 @@ public class RsaService : IRsaService
     public string Decrypt(string encryptedData)
     {
         var encryptedBytes = Convert.FromBase64String(encryptedData);
+        Console.WriteLine($"Private key size (bits): {_rsa.KeySize}");
+        Console.WriteLine($"Encrypted data length (bytes): {encryptedBytes.Length}");
         var decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.OaepSHA256);
         return Encoding.UTF8.GetString(decryptedBytes);
     }
@@ -48,8 +50,8 @@ public class RsaService : IRsaService
     private (string publicKey, string privateKey) GenerateRsaKeys()
     {
         var rsa = RSA.Create(2048);
-        var publicKey = rsa.ExportRSAPublicKeyPem();
-        var privateKey = rsa.ExportRSAPrivateKeyPem();
+        var publicKey = rsa.ExportSubjectPublicKeyInfoPem();
+        var privateKey = rsa.ExportPkcs8PrivateKeyPem();
         return (publicKey, privateKey);
     }
     
@@ -58,9 +60,13 @@ public class RsaService : IRsaService
         try
         {
             var rsaDectypt = RSA.Create();
+            publicKeyPem = publicKeyPem.Replace("\\n", "\n");
             rsaDectypt.ImportFromPem(publicKeyPem);
             var bytesToEncrypt = Encoding.UTF8.GetBytes(RawData);
             var encryptedBytes = rsaDectypt.Encrypt(bytesToEncrypt, RSAEncryptionPadding.OaepSHA256);
+            Console.WriteLine($"Private key size (bits): {_rsa.KeySize}");
+            Console.WriteLine($"Private key size (bits): {rsaDectypt.KeySize}");
+            Console.WriteLine($"Encrypted data length (bytes): {encryptedBytes.Length}");
             return Convert.ToBase64String(encryptedBytes);
         }
         catch (CryptographicException ex)

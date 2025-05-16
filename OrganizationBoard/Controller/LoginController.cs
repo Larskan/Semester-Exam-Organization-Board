@@ -13,6 +13,7 @@ using OrganizationBoard.DTO;
 using OrganizationBoard.IService;
 using Polly;
 using OrganizationBoard.Service;
+using System.Security.Cryptography;
 
 namespace OrganizationBoard.Controller;
 
@@ -101,12 +102,22 @@ public class LoginController : ControllerBase
         var publicKey = _rsaService.GetPublicKey();
         return Ok(new { publicKey });
     }
-    
+
     [HttpGet("EncryptPasswordBummyForWebsideResponsabilety")]
     [AllowAnonymous]
     public IActionResult EncryptPasswordBummyForWebsideResponsabilety(string password, string publicKeyPem)
     {
-        var Encrypted = _rsaService.EncryptOutside(password,publicKeyPem);
+        var Encrypted = _rsaService.EncryptOutside(password, publicKeyPem);
         return Ok(new { Encrypted });
+    }
+    
+    [HttpGet("testPem")]
+    [AllowAnonymous]
+    public IActionResult testPem(string publicKeyPem)
+    {
+            using var sha256 = SHA256.Create();
+        var bytes = Encoding.UTF8.GetBytes(publicKeyPem.Replace("\\n", "\n"));
+        var return1 = Convert.ToBase64String(sha256.ComputeHash(bytes));
+        return Ok(new { return1 });
     }
 }

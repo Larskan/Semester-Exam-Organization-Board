@@ -37,10 +37,10 @@ namespace OrganizationBoard.Service
                     throw new UnauthorizedAccessException();
                 }
 
-                // TODO: Decrypt Password
-                var decryptPassword = _rsaService.Decrypt(user.Password);
-
-                bool valid = _bCryptService.VerifyPassword(dto.Password, decryptPassword);
+                Console.WriteLine("before");
+                var decryptPassword = _rsaService.Decrypt(dto.Password);
+                Console.WriteLine("before");
+                bool valid = _bCryptService.VerifyPassword(decryptPassword, user.Password);
 
                 if (!valid)
                 {
