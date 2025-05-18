@@ -30,14 +30,15 @@ public static class TestDataFactory
         };
     }
 
-    public static EFrameWork.Model.Task CreateTask(int boardId, string title = "Task", string desc = "Description")
+    public static EFrameWork.Model.Task CreateTask(int boardId, string title = "Task", string desc = "Description", int? taskId = null, int statusId = 1)
     {
         return new EFrameWork.Model.Task
         {
+            TaskID = taskId ?? 0, // Allow setting TaskID explicitly
             BoardID = boardId,
             Title = title,
             Description = desc,
-            StatusID = 1,
+            StatusID = statusId,
             Estimation = 3,
             NumUser = 1
         };
@@ -48,6 +49,18 @@ public static class TestDataFactory
         return new BoardDto
         {
             BoardName = name
+        };
+    }
+
+    public static TaskDto CreateTaskDto(string title, string description = "Description", int estimation = 3, int numUser = 1, int boardId = 0)
+    {
+        return new TaskDto
+        {
+            Title = title,
+            Description = description,
+            Estimation = estimation,
+            NumUser = numUser,
+            BoardID = boardId
         };
     }
 }

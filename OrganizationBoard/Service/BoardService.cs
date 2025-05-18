@@ -118,7 +118,6 @@ namespace OrganizationBoard.Service
 
         public async Task<OperationResponse<BoardReadDto>> UpdateBoard(BoardReadDto board, int requestingUserId)
         {
-
             try
             {
                 var existingBoard = _context.BoardTables!.FirstOrDefault(b => b.BoardID == board.BoardID);
@@ -232,6 +231,10 @@ namespace OrganizationBoard.Service
         #region Task Management
         public async Task<OperationResponse<TaskDto>> CreateTask(TaskDto task, int boardId, int requestingUserId)
         {
+            // Check if Board exists
+            var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
+            if (board == null)
+                return new OperationResponse<TaskDto>("Board not found", false, 404);
             // Only Team Leaders can create tasks
             if (!await IsUserTeamLeader(requestingUserId))
                 return new OperationResponse<TaskDto>("Access Denied", false, 403);
@@ -385,13 +388,17 @@ namespace OrganizationBoard.Service
         {
             try
             {
-                // Only Team Members can mark tasks as complete
-                if (!await IsUserInTask(requestingUserId, taskId))
-                    return new OperationResponse<bool>("Access Denied", false, 403);
-
                 var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
                 if (task == null)
+                {
                     return new OperationResponse<bool>("Task not found", false, 404);
+                }
+
+                // Only Team Members assigned to the task can mark it as complete
+                if (!await IsUserInTask(requestingUserId, taskId))
+                {
+                    return new OperationResponse<bool>("Access Denied", false, 403);
+                }
 
                 task.StatusID = 2; // Assuming 2 is the ID for "Done"
                 await _context.SaveChangesAsync();

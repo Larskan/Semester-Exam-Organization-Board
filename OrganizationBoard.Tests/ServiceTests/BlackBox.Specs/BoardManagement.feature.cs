@@ -24,8 +24,8 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "ServiceTests/BlackBox.Specs", "Board Management", "  As a team leader or member\r\n  I want to manage boards\r\n  So that I can organize" +
-                " team tasks", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en"), "ServiceTests/BlackBox.Specs", "Board Management", "  As a team leader or member\r\n  I want to manage boards and tasks\r\n  So that I ca" +
+                "n organize team work effectively", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
@@ -136,7 +136,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Create a board successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 6
+#line 8
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -146,16 +146,16 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 7
+#line 9
     await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 8
+#line 10
     await testRunner.WhenAsync("I create a board named \"Sprint Planning\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 9
+#line 11
     await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 10
+#line 12
     await testRunner.AndAsync("the returned board ID should not be 0", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
@@ -170,7 +170,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to create board as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 12
+#line 14
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -180,13 +180,387 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 13
+#line 15
     await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 16
     await testRunner.WhenAsync("I create a board named \"Backlog\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 17
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Update board successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Update board successfully")]
+        public async global::System.Threading.Tasks.Task UpdateBoardSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Update board successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 19
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 20
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 21
+    await testRunner.AndAsync("a board with ID 2 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 22
+    await testRunner.WhenAsync("I update board 2 name to \"Revised Plan\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 23
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to update board as team member")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to update board as team member")]
+        public async global::System.Threading.Tasks.Task FailToUpdateBoardAsTeamMember()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to update board as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 25
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 26
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 27
+    await testRunner.AndAsync("a board with ID 3 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 28
+    await testRunner.WhenAsync("I update board 3 name to \"Another Plan\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 29
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to update non-existent board")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to update non-existent board")]
+        public async global::System.Threading.Tasks.Task FailToUpdateNon_ExistentBoard()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to update non-existent board", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 31
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 32
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 33
+    await testRunner.WhenAsync("I update board 99 name to \"Non Existent\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 34
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Delete board successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Delete board successfully")]
+        public async global::System.Threading.Tasks.Task DeleteBoardSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Delete board successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 36
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 37
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 38
+    await testRunner.AndAsync("a board with ID 4 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 39
+    await testRunner.WhenAsync("I delete board 4", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 40
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to delete board as team member")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to delete board as team member")]
+        public async global::System.Threading.Tasks.Task FailToDeleteBoardAsTeamMember()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to delete board as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 42
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 43
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 44
+    await testRunner.AndAsync("a board with ID 5 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 45
+    await testRunner.WhenAsync("I delete board 5", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 46
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to delete non-existent board")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to delete non-existent board")]
+        public async global::System.Threading.Tasks.Task FailToDeleteNon_ExistentBoard()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to delete non-existent board", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 48
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 49
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 50
+    await testRunner.WhenAsync("I delete board 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 51
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Get board by ID successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Get board by ID successfully")]
+        public async global::System.Threading.Tasks.Task GetBoardByIDSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Get board by ID successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 53
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 54
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 55
+    await testRunner.AndAsync("a board with ID 6 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 56
+    await testRunner.WhenAsync("I get board with ID 6", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 57
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 58
+    await testRunner.AndAsync("the returned board ID should be 6", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to get board by ID as outsider")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to get board by ID as outsider")]
+        public async global::System.Threading.Tasks.Task FailToGetBoardByIDAsOutsider()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to get board by ID as outsider", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 60
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 61
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 99 in team 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 62
+    await testRunner.AndAsync("a board with ID 7 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 63
+    await testRunner.WhenAsync("I get board with ID 7", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 64
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to get non-existent board by ID")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to get non-existent board by ID")]
+        public async global::System.Threading.Tasks.Task FailToGetNon_ExistentBoardByID()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to get non-existent board by ID", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 66
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 67
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 68
+    await testRunner.WhenAsync("I get board with ID 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 69
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Get team boards successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Get team boards successfully")]
+        public async global::System.Threading.Tasks.Task GetTeamBoardsSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Get team boards successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 71
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 72
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 73
+    await testRunner.AndAsync("a board with ID 8 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 74
+    await testRunner.AndAsync("a board with ID 9 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 75
+    await testRunner.WhenAsync("I get all boards for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 76
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 77
+    await testRunner.AndAsync("the returned board list should contain at least 2 boards", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to get team boards as outsider")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to get team boards as outsider")]
+        public async global::System.Threading.Tasks.Task FailToGetTeamBoardsAsOutsider()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to get team boards as outsider", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 79
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 80
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 99 in team 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 81
+    await testRunner.AndAsync("a board with ID 10 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 82
+    await testRunner.WhenAsync("I get all boards for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 83
     await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -201,7 +575,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Get board tasks successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 17
+#line 85
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -211,19 +585,19 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 18
+#line 86
     await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 19
-    await testRunner.AndAsync("a board with ID 1 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 87
+    await testRunner.AndAsync("a board with ID 11 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 20
+#line 88
     await testRunner.AndAsync("the board has tasks", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 21
-    await testRunner.WhenAsync("I fetch tasks for board 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 89
+    await testRunner.WhenAsync("I fetch tasks for board 11", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 90
     await testRunner.ThenAsync("the task response should contain tasks", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -238,7 +612,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to fetch tasks as outsider", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 24
+#line 92
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -248,17 +622,773 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 25
-    await testRunner.GivenAsync("a board with ID 1 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 93
+    await testRunner.GivenAsync("a board with ID 12 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 26
+#line 94
     await testRunner.AndAsync("I am a \"Team Member\" user with ID 99 in team 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 27
-    await testRunner.WhenAsync("I fetch tasks for board 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 95
+    await testRunner.WhenAsync("I fetch tasks for board 12", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 28
+#line 96
     await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Create task successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Create task successfully")]
+        public async global::System.Threading.Tasks.Task CreateTaskSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Create task successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 98
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 99
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 100
+    await testRunner.AndAsync("a board with ID 13 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 101
+    await testRunner.WhenAsync("I create a task named \"Implement Feature A\" for board 13", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 102
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 103
+    await testRunner.AndAsync("the returned task ID should not be 0", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to create task as team member")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to create task as team member")]
+        public async global::System.Threading.Tasks.Task FailToCreateTaskAsTeamMember()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to create task as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 105
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 106
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 107
+    await testRunner.AndAsync("a board with ID 14 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 108
+    await testRunner.WhenAsync("I create a task named \"Write Unit Tests\" for board 14", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 109
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to create task for non-existent board")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to create task for non-existent board")]
+        public async global::System.Threading.Tasks.Task FailToCreateTaskForNon_ExistentBoard()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to create task for non-existent board", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 111
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 112
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 113
+    await testRunner.WhenAsync("I create a task named \"Deploy\" for board 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 114
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Get task by ID successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Get task by ID successfully")]
+        public async global::System.Threading.Tasks.Task GetTaskByIDSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Get task by ID successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 116
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 117
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 118
+    await testRunner.AndAsync("a board with ID 15 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 119
+    await testRunner.AndAsync("a task with ID 1 exists on board 15", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 120
+    await testRunner.WhenAsync("I get task with ID 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 121
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 122
+    await testRunner.AndAsync("the returned task ID should be 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to get non-existent task by ID")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to get non-existent task by ID")]
+        public async global::System.Threading.Tasks.Task FailToGetNon_ExistentTaskByID()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to get non-existent task by ID", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 124
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 125
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 126
+    await testRunner.AndAsync("a board with ID 16 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 127
+    await testRunner.WhenAsync("I get task with ID 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 128
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Update task successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Update task successfully")]
+        public async global::System.Threading.Tasks.Task UpdateTaskSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Update task successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 130
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 131
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 132
+    await testRunner.AndAsync("a board with ID 17 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 133
+    await testRunner.AndAsync("a task with ID 2 exists on board 17", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 134
+    await testRunner.WhenAsync("I update task 2 title to \"Implement Feature B\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 135
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to update task as team member")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to update task as team member")]
+        public async global::System.Threading.Tasks.Task FailToUpdateTaskAsTeamMember()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to update task as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 137
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 138
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 139
+    await testRunner.AndAsync("a board with ID 18 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 140
+    await testRunner.AndAsync("a task with ID 3 exists on board 18", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 141
+    await testRunner.WhenAsync("I update task 3 title to \"Refactor Code\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 142
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to update non-existent task")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to update non-existent task")]
+        public async global::System.Threading.Tasks.Task FailToUpdateNon_ExistentTask()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to update non-existent task", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 144
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 145
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 146
+    await testRunner.AndAsync("a board with ID 19 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 147
+    await testRunner.WhenAsync("I update task 99 title to \"Something\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 148
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Delete task successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Delete task successfully")]
+        public async global::System.Threading.Tasks.Task DeleteTaskSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Delete task successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 150
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 151
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 152
+    await testRunner.AndAsync("a board with ID 20 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 153
+    await testRunner.AndAsync("a task with ID 4 exists on board 20", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 154
+    await testRunner.WhenAsync("I delete task 4", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 155
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to delete task as team member")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to delete task as team member")]
+        public async global::System.Threading.Tasks.Task FailToDeleteTaskAsTeamMember()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to delete task as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 157
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 158
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 159
+    await testRunner.AndAsync("a board with ID 21 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 160
+    await testRunner.AndAsync("a task with ID 5 exists on board 21", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 161
+    await testRunner.WhenAsync("I delete task 5", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 162
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to delete non-existent task")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to delete non-existent task")]
+        public async global::System.Threading.Tasks.Task FailToDeleteNon_ExistentTask()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to delete non-existent task", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 164
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 165
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 166
+    await testRunner.AndAsync("a board with ID 22 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 167
+    await testRunner.WhenAsync("I delete task 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 168
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Assign task successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Assign task successfully")]
+        public async global::System.Threading.Tasks.Task AssignTaskSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Assign task successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 170
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 171
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 172
+    await testRunner.AndAsync("a board with ID 23 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 173
+    await testRunner.AndAsync("a task with ID 6 exists on board 23", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 174
+    await testRunner.AndAsync("a user with ID 6 exists in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 175
+    await testRunner.WhenAsync("I assign task 6 to user 6", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 176
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to assign task as team member")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to assign task as team member")]
+        public async global::System.Threading.Tasks.Task FailToAssignTaskAsTeamMember()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to assign task as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 178
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 179
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 180
+    await testRunner.AndAsync("a board with ID 24 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 181
+    await testRunner.AndAsync("a task with ID 7 exists on board 24", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 182
+    await testRunner.AndAsync("a user with ID 6 exists in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 183
+    await testRunner.WhenAsync("I assign task 7 to user 6", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 184
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to assign non-existent task")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to assign non-existent task")]
+        public async global::System.Threading.Tasks.Task FailToAssignNon_ExistentTask()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to assign non-existent task", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 186
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 187
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 188
+    await testRunner.AndAsync("a board with ID 25 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 189
+    await testRunner.AndAsync("a user with ID 6 exists in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 190
+    await testRunner.WhenAsync("I assign task 99 to user 6", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 191
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to assign to non-existent user")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to assign to non-existent user")]
+        public async global::System.Threading.Tasks.Task FailToAssignToNon_ExistentUser()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to assign to non-existent user", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 193
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 194
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 195
+    await testRunner.AndAsync("a board with ID 26 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 196
+    await testRunner.AndAsync("a task with ID 8 exists on board 26", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 197
+    await testRunner.WhenAsync("I assign task 8 to user 99", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 198
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Mark task as complete successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Mark task as complete successfully")]
+        public async global::System.Threading.Tasks.Task MarkTaskAsCompleteSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Mark task as complete successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 200
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 201
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 202
+    await testRunner.AndAsync("a board with ID 27 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 203
+    await testRunner.AndAsync("a task with ID 9 exists on board 27 assigned to user 5", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 204
+    await testRunner.WhenAsync("I mark task 9 as complete", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 205
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to mark task as complete if not assigned")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to mark task as complete if not assigned")]
+        public async global::System.Threading.Tasks.Task FailToMarkTaskAsCompleteIfNotAssigned()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to mark task as complete if not assigned", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 207
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 208
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 209
+    await testRunner.AndAsync("a board with ID 28 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 210
+    await testRunner.AndAsync("a task with ID 10 exists on board 28 not assigned to user 5", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 211
+    await testRunner.WhenAsync("I mark task 10 as complete", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 212
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to mark non-existent task as complete")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to mark non-existent task as complete")]
+        public async global::System.Threading.Tasks.Task FailToMarkNon_ExistentTaskAsComplete()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to mark non-existent task as complete", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 214
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 215
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 216
+    await testRunner.WhenAsync("I mark task 99 as complete", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 217
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Confirm task completion successfully")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Confirm task completion successfully")]
+        public async global::System.Threading.Tasks.Task ConfirmTaskCompletionSuccessfully()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Confirm task completion successfully", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 219
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 220
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 221
+    await testRunner.AndAsync("a board with ID 29 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 222
+    await testRunner.AndAsync("a task with ID 11 exists on board 29 marked as complete", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 223
+    await testRunner.WhenAsync("I confirm task 11 completion", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 224
+    await testRunner.ThenAsync("the operation should succeed", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to confirm task completion as team member")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to confirm task completion as team member")]
+        public async global::System.Threading.Tasks.Task FailToConfirmTaskCompletionAsTeamMember()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to confirm task completion as team member", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 226
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 227
+    await testRunner.GivenAsync("I am a \"Team Member\" user with ID 5 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 228
+    await testRunner.AndAsync("a board with ID 30 exists for team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 229
+    await testRunner.AndAsync("a task with ID 12 exists on board 30 marked as complete", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 230
+    await testRunner.WhenAsync("I confirm task 12 completion", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 231
+    await testRunner.ThenAsync("the operation should fail with status code 403", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Fail to confirm non-existent task completion")]
+        [Xunit.TraitAttribute("FeatureTitle", "Board Management")]
+        [Xunit.TraitAttribute("Description", "Fail to confirm non-existent task completion")]
+        public async global::System.Threading.Tasks.Task FailToConfirmNon_ExistentTaskCompletion()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Fail to confirm non-existent task completion", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 233
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 234
+    await testRunner.GivenAsync("I am a \"Team Leader\" user with ID 4 in team 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 235
+    await testRunner.WhenAsync("I confirm task 99 completion", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 236
+    await testRunner.ThenAsync("the operation should fail with status code 404", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
