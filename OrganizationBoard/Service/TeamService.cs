@@ -31,15 +31,15 @@ namespace OrganizationBoard.Service
             return user != null && user.TeamID == team.TeamID && team != null;
         }
         #endregion Private Methods
-        
+
         // 2 Decisions = 3 Tests.
         // Test: Leader as valid user, set to False = 403.
         // Test: User as valid user, creating new team
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<Team>> CreateTeam(Team team, int requestingUserId)
+        public async Task<OperationResponse<TeamDto>> CreateTeam(TeamDto team, int requestingUserId)
         {
             if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<Team>("Only team leaders can update teams.", false, 403);
+                return new OperationResponse<TeamDto>("Only team leaders can update teams.", false, 403);
 
             var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == requestingUserId);
 
@@ -47,17 +47,19 @@ namespace OrganizationBoard.Service
             {
                 var newTeam = new Team
                 {
-                    TeamName = team.TeamName,
                     TeamID = (int)user.TeamID,
+                    TeamName = team.TeamName
                 };
                 _context.TeamTables.Add(newTeam);
                 await _context.SaveChangesAsync();
 
-                return new OperationResponse<Team>(team, "Team created successfully.");
+                team.TeamID = newTeam.TeamID;
+
+                return new OperationResponse<TeamDto>(team, "Team created successfully.");
             }
             catch (Exception ex)
             {
-                return new OperationResponse<Team>(ex.Message, false, 500);
+                return new OperationResponse<TeamDto>(ex.Message, false, 500);
             }
         }
 
@@ -66,25 +68,25 @@ namespace OrganizationBoard.Service
         // Test: existingTeam as null = 404
         // Test: existingTeam as valid team 
         // Test: failing to update team = 500
-        public async Task<OperationResponse<Team>> UpdateTeam(Team team, int requestingUserId)
+        public async Task<OperationResponse<TeamDto>> UpdateTeam(TeamDto team, int requestingUserId)
         {
 
             if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<Team>("Only team leaders can update teams.", false, 403);
+                return new OperationResponse<TeamDto>("Only team leaders can update teams.", false, 403);
 
             try
             {
                 var existingTeam = _context.TeamTables!.FirstOrDefault(t => t.TeamID == team.TeamID);
                 if (existingTeam == null)
-                    return new OperationResponse<Team>("Team not found.", false, 404);
+                    return new OperationResponse<TeamDto>("Team not found.", false, 404);
 
                 existingTeam.TeamName = team.TeamName;
                 await _context.SaveChangesAsync();
-                return new OperationResponse<Team>(team, "Team updated successfully.");
+                return new OperationResponse<TeamDto>(team, "Team updated successfully.");
             }
             catch (Exception ex)
             {
-                return new OperationResponse<Team>(ex.Message, false, 500);
+                return new OperationResponse<TeamDto>(ex.Message, false, 500);
             }
         }
 
@@ -208,6 +210,4 @@ namespace OrganizationBoard.Service
             }
         }
     }
-
-    
 }

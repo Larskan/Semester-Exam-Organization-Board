@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using EFramework.Data;
 using EFrameWork.Model;
 using OrganizationBoard.Service;
+using Moq;
+using OrganizationBoard.DTO;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
@@ -24,10 +26,10 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             );
             context.UserTables.AddRange(
                 new User { UserID = 1, RoleID = 1, Email = "Test1@email.com", Password = "1234", OrganizationID = 1 }, //Admin
-                new User { UserID = 5, RoleID = 3, Email = "Test5@email.com", Password = "1234", OrganizationID = 1 }, //Member without team
                 new User { UserID = 2, RoleID = 2, Email = "Test2@email.com", Password = "1234", OrganizationID = 1, TeamID = 1 }, // Leader
                 new User { UserID = 3, RoleID = 3, Email = "Test3@email.com", Password = "1234", OrganizationID = 1, TeamID = 1 }, // Member
-                new User { UserID = 4, RoleID = 2, Email = "Test4@email.com", Password = "1234", OrganizationID = 1, TeamID = 2 }  // Leader
+                new User { UserID = 4, RoleID = 2, Email = "Test4@email.com", Password = "1234", OrganizationID = 1, TeamID = 2 },  // Leader
+                new User { UserID = 5, RoleID = 3, Email = "Test5@email.com", Password = "1234", OrganizationID = 1 } //Member without team
             );
             context.SaveChanges();
             return context;
@@ -43,7 +45,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.CreateTeam(new Team { TeamName = "Dev Team" }, 3); //Not a leader ID
+            var result = await service.CreateTeam(new TeamDto { TeamName = "Dev Team" }, 3); //Not a leader ID
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -59,7 +61,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.CreateTeam(new Team { TeamName = "Success Team" }, 4);
+            var result = await service.CreateTeam(new TeamDto { TeamID = 3, TeamName = "Success Team" }, 4);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -81,7 +83,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.CreateTeam(new Team { TeamName = "Dupe Team" }, 4);
+            var result = await service.CreateTeam(new TeamDto { TeamName = "Dupe Team" }, 4);
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -100,7 +102,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new Team { TeamName = "Dev Team" }, 3);
+            var result = await service.UpdateTeam(new TeamDto { TeamName = "Dev Team" }, 3);
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -116,7 +118,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new Team { TeamID = 999, TeamName = "Nonexistent Team" }, 2);
+            var result = await service.UpdateTeam(new TeamDto { TeamID = 999, TeamName = "Nonexistent Team" }, 2);
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -132,7 +134,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new Team { TeamID = 2, TeamName = "Updated Team" }, 4);
+            var result = await service.UpdateTeam(new TeamDto { TeamID = 2, TeamName = "Updated Team" }, 4);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -152,7 +154,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new Team { TeamID = 2, TeamName = "Team 3" }, 4);
+            var result = await service.UpdateTeam(new TeamDto { TeamID = 2, TeamName = "Team 3" }, 4);
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -462,9 +464,17 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         public async System.Threading.Tasks.Task RemoveUserFromTeam_Returns500_IfExceptionOccurs()
         {
             // Arrange
-            var context = GetInMemoryDbContext("RemoveUserFromTeamExceptionTest");
-            var service = new TeamService(context);
-            context.Dispose();
+            var mockSet = new Mock<DbSet<Team>>();
+            var mockUserSet = new Mock<DbSet<User>>();
+            var mockContext = new Mock<OBDbContext>();
+
+            // Throw exception when accessing TeamTables.
+            mockContext.Setup(m => m.TeamTables).Throws(new Exception("Simulated DB Error"));
+
+            // Setup required dependencies even if not used in this failure path.
+            mockContext.Setup(m => m.UserTables).Returns(mockUserSet.Object);
+
+            var service = new TeamService(mockContext.Object);
 
             // Act
             var result = await service.RemoveUserFromTeam(1, 3, 2);
@@ -473,6 +483,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.False(result.IsSuccess);
             Assert.Equal(500, result.StatusCode);
         }
+
         #endregion Tests for RemoveUserFromTeam
 
     }
