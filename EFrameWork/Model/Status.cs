@@ -17,13 +17,5 @@ namespace Model
 
         public ICollection<EFrameWork.Model.Task> Tasks { get; set; }
     }
-    // public enum TaskStatus
-    // {
-    //     NotStarted,
-    //     Ongoing,
-    //     Done
-    //     // TODO: Need NotStarted -> Ongoing -> Done -> Confirmed
-    // }
-
 }
 

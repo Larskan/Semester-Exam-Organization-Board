@@ -21,8 +21,7 @@ TODO: Lars = IAdminService + ITeamService
 - Code left to do
 Mangler: AdminService
 Mangler: Cucumber til BoardService.
-Mangler: Decide on Methods to use for Path Testing
-Mangler: MC/DC Tests for AdminService and TeamService.
+Mangler: MC/DC Tests for AdminService
 Mangler: Tests for Login
 Mangler: Postman Testing for al API
 Mangler: Test for Public and Private Key
@@ -31,8 +30,8 @@ Mangler: Test for Public and Private Key
 Rapport SWQ: DD Path Graphs for alle vigtige metoder, hvis nogle metoder ikke har en, forklar hvorfor.
 Rapport SWQ: Testing Methodology, overview of the testing we have done and how we did them
 
-Rapport SSD: Introduction
-Rapport SSD: Threat Model Report, addressing the vulnerabilities.
+Rapport SSD: Introduction - DONE
+Rapport SSD: Threat Model Report, addressing the vulnerabilities. - DONE
 Rapport SSD: Detailing the Login Section and how we have secured it.
 
 Note regarding SSD: Look through notes to find keywords used by Rasmus during the semester

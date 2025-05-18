@@ -33,7 +33,7 @@ namespace OrganizationBoard.Service
             var newUser = new User
             {
                 Email = user.Email,
-                Password = user.Password, //Hash it //FIXME
+                Password = user.Password,
                 RoleID = user.RoleID,
                 OrganizationID = user.OrganizationID,
                 TeamID = user.TeamID

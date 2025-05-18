@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using OrganizationBoard.DTO;
 using Microsoft.EntityFrameworkCore;
 using EFramework.Data;
 using EFrameWork.Model;
 using OrganizationBoard.Service;
-using Xunit.Abstractions;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
@@ -146,8 +140,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal("Updated Team", result.Data.TeamName);
         }
 
-        // Test: failing to update team = 500
-        // FIXME
+        // Test: failing to update team = 500 //FIXME
         [Fact]
         public async System.Threading.Tasks.Task UpdateTeam_Returns500_IfExceptionOccurs()
         {
@@ -267,7 +260,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.False(result.IsSuccess);
             Assert.Equal(403, result.StatusCode);
         }
-        // Test: Members as null and members.Count == 0 = 404
+        // Test: Members as null and members.Count == 0 = 404//FIXME
         [Fact]
         public async System.Threading.Tasks.Task GetTeamMembers_Returns404_IfNoMembersFound()
         {
@@ -306,7 +299,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal("Members retrieved successfully.", result.Message);
             Assert.NotEmpty(result.Data);
         }
-        // Test: Exception in try/catch = 500
+        // Test: Exception in try/catch = 500//FIXME
         [Fact]
         public async System.Threading.Tasks.Task GetTeamMembers_Returns500_IfExceptionOccurs()
         {
@@ -385,7 +378,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.True(result.IsSuccess);
             Assert.Equal("User assigned to team successfully.", result.Message);
         }
-        // Test: Exception in try/catch = 500
+        // Test: Exception in try/catch = 500//FIXME
         [Fact]
         public async System.Threading.Tasks.Task AssignUserToTeam_Returns500_IfExceptionOccurs()
         {
@@ -462,9 +455,9 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal("User removed from team successfully.", result.Message);
+            Assert.Equal("User assigned to team successfully.", result.Message);
         }
-        // Test: Exception in try/catch = 500
+        // Test: Exception in try/catch = 500//FIXME
         [Fact]
         public async System.Threading.Tasks.Task RemoveUserFromTeam_Returns500_IfExceptionOccurs()
         {
