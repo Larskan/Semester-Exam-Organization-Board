@@ -24,6 +24,7 @@ namespace OrganizationBoard.Service
             _bCryptService = bCryptService;
             _rsaService = rsaService;
         }
+
         public async Task<User> UserCheck(LoginDto dto)
         {
             try
