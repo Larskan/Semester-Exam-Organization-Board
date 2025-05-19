@@ -33,7 +33,7 @@ namespace OrganizationBoard.Service
             var newUser = new User
             {
                 Email = user.Email,
-                Password = user.Password, //Hash it //FIXME
+                Password = user.Password,
                 RoleID = user.RoleID,
                 OrganizationID = user.OrganizationID,
                 TeamID = user.TeamID
@@ -121,6 +121,25 @@ namespace OrganizationBoard.Service
             return new OperationResponse<List<User>>(users);
         }
     #endregion User Management
+
+        #region Organization Management
+        public async Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId)
+        {
+            if (!await IsUserAdmin(requestingAdminId))
+                return new OperationResponse<Organization>("Access Denied", false, 403);
+
+            var existingOrg = await _context.OrganizationTables!.FindAsync(organization.OrganizationID);
+            if (existingOrg == null)
+                return new OperationResponse<Organization>("Organization not found", false, 404);
+
+            existingOrg.OrganizationName = organization.OrganizationName;
+
+            _context.OrganizationTables.Update(existingOrg);
+            await _context.SaveChangesAsync();
+
+            return new OperationResponse<Organization>(organization, "Organization updated successfully");
+        }
+    #endregion Organization Management
 
         
     }

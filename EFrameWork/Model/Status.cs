@@ -11,18 +11,11 @@ namespace Model
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int StatusID {get; set;}
+        public int StatusID { get; set; }
         [Required]
-        public TaskStatus StatusOption {get; set;}
+        public string TaskStatus { get; set; }
 
         public ICollection<EFrameWork.Model.Task> Tasks { get; set; }
     }
-    public enum TaskStatus
-    {
-        NotStarted,
-        Ongoing,
-        Done
-    }
-
 }
 

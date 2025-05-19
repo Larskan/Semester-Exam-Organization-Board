@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using EFramework.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using OrganizationBoard.IService;
+using OrganizationBoard.Service;
 using Polly;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -53,7 +55,6 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenCreation, TokenCreation>();
 builder.Services.AddScoped<IBCryptService, BCryptService>();
 builder.Services.AddSingleton<IRsaService, RsaService>();
-
 
 var configuration = builder.Configuration;
 builder.Services.AddDbContext<OBDbContext>(options =>

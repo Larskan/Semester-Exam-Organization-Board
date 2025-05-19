@@ -17,7 +17,7 @@ namespace OrganizationBoard.IService
         Task<OperationResponse<List<User>>> GetAllUsers(int requestingAdminId);
 
         // Role Management
-        // Task<OperationResponse<Role>> CreateRole(Role role, int requestingAdminId);
+        // Task<OperationResponse<Role>> CreateRole(Role role, int requestingAdminId); - Overvej
         // Task<OperationResponse<Role>> GetRole(int roleId, int requestingAdminId);
         // Task<OperationResponse<Role>> UpdateRole(Role role, int requestingAdminId);
         // Task<OperationResponse<bool>> DeleteRole(int roleId, int requestingAdminId);
@@ -25,10 +25,10 @@ namespace OrganizationBoard.IService
         // Task<OperationResponse<bool>> AssignRoleToUser(int userId, int roleId, int requestingAdminId);
 
         //Organization Management
-        // //Task<OperationResponse<Organization>> CreateOrganization(Organization organization, int requestingAdminId);
+        // Task<OperationResponse<Organization>> CreateOrganization(Organization organization, int requestingAdminId);
         // Task<OperationResponse<Organization>> GetOrganization(int organizationId, int requestingAdminId);
-        // Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId);
-        // Task<OperationResponse<bool>> DeleteOrganization(int organizationId, int requestingAdminId); //Discuss
+        Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId);
+        // Task<OperationResponse<bool>> DeleteOrganization(int organizationId, int requestingAdminId);  - Overvej
         //Task<OperationResponse<List<Organization>>> GetAllOrganizations(int requestingAdminId);
     }
 }

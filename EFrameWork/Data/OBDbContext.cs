@@ -27,7 +27,7 @@ namespace EFramework.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Role>().Property(r => r.RoleName).HasColumnName("Role");
-            modelBuilder.Entity<Status>().Property(s => s.StatusOption).HasColumnName("Status");
+            modelBuilder.Entity<Status>().Property(s => s.TaskStatus).HasColumnName("Status");
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
@@ -62,7 +62,7 @@ namespace EFramework.Data
             modelBuilder.Entity<UserToTask>()
                 .HasOne(ut => ut.User)
                 .WithMany(u => u.TaskAssignments)
-                .HasForeignKey(ut => ut.UserID) 
+                .HasForeignKey(ut => ut.UserID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserToTask>()
@@ -72,18 +72,25 @@ namespace EFramework.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Team>().HasData(
-                new Team {TeamID = 1, TeamName = "team 1"},
-                new Team {TeamID = 2, TeamName = "team 2"}
+                new Team { TeamID = 1, TeamName = "team 1" },
+                new Team { TeamID = 2, TeamName = "team 2" }
             );
 
             modelBuilder.Entity<Organization>().HasData(
-                new Organization{OrganizationID = 1, OrganizationName = "Lars"}
+                new Organization { OrganizationID = 1, OrganizationName = "Lars" }
             );
 
             modelBuilder.Entity<Role>().HasData(
-                new Role {RoleID = 1, RoleName = "Admin"},
-                new Role {RoleID = 2, RoleName = "Team Leader"},
-                new Role {RoleID = 3, RoleName = "Team Member"}
+                new Role { RoleID = 1, RoleName = "Admin" },
+                new Role { RoleID = 2, RoleName = "Team Leader" },
+                new Role { RoleID = 3, RoleName = "Team Member" }
+            );
+
+            modelBuilder.Entity<Status>().HasData(
+                new Status { StatusID = 1, TaskStatus = "To Do" },
+                new Status { StatusID = 2, TaskStatus = "In Progress" },
+                new Status { StatusID = 3, TaskStatus = "Done" },
+                new Status { StatusID = 4, TaskStatus = "Confirmed" }
             );
 
             modelBuilder.Entity<User>().HasData(
