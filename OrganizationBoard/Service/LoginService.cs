@@ -18,43 +18,35 @@ namespace OrganizationBoard.Service
         private readonly OBDbContext _db;
         private readonly IBCryptService _bCryptService;
         private readonly IRsaService _rsaService;
-        private readonly IAsyncPolicy _retryPolicy;
 
-        public LoginService(OBDbContext db, IBCryptService bCryptService, IRsaService rsaService, IAsyncPolicy retryPolicy)
+        public LoginService(OBDbContext db, IBCryptService bCryptService, IRsaService rsaService)
         {
-            _retryPolicy = retryPolicy;
             _bCryptService = bCryptService;
             _rsaService = rsaService;
-            _retryPolicy = retryPolicy;
             _db = db;
         }
-
-
         public async Task<User> UserCheck(LoginDto dto)
         {
             try
             {
-                return await _retryPolicy.ExecuteAsync(async () =>
-                {
-                    var user = await _db.UserTables!
-                        .Include(u => u.Role)
-                        .FirstOrDefaultAsync(u => u.Email == dto.Email);
+                var user = await _db.UserTables!
+                    .Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
-                    if (user == null)
-                    {
-                        throw new UnauthorizedAccessException();
-                    }
+                if (user == null)
+                {
+                    throw new UnauthorizedAccessException();
+                }
 
                 var decryptPassword = _rsaService.Decrypt(dto.Password);
                 bool valid = _bCryptService.VerifyPassword(decryptPassword, user.Password);
 
-                    if (!valid)
-                    {
-                        throw new UnauthorizedAccessException();
-                    }
+                if (!valid)
+                {
+                    throw new UnauthorizedAccessException();
+                }
 
-                    return user;
-                });
+                return user;
             }
             catch (UnauthorizedAccessException)
             {
@@ -93,8 +85,8 @@ namespace OrganizationBoard.Service
                     OrganizationName = orgName
                 };
 
-                    await _db.OrganizationTables!.AddAsync(Organization);
-                    await _db.SaveChangesAsync();
+                await _db.OrganizationTables!.AddAsync(Organization);
+                await _db.SaveChangesAsync();
 
                 var Password = _bCryptService.HashPassword(dto.Password);
                 var user = new User
@@ -105,9 +97,8 @@ namespace OrganizationBoard.Service
                     OrganizationID = Organization.OrganizationID
                 };
 
-                    await _db.UserTables!.AddAsync(user);
-                    await _db.SaveChangesAsync();
-                });
+                await _db.UserTables!.AddAsync(user);
+                await _db.SaveChangesAsync();
             }
             catch (Exception ex)
             {

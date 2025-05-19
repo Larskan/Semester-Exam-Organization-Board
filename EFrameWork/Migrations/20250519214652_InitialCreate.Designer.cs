@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFrameWork.Migrations
 {
     [DbContext(typeof(OBDbContext))]
-    [Migration("20250519095013_FixTables")]
-    partial class FixTables
+    [Migration("20250519214652_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -175,7 +175,7 @@ namespace EFrameWork.Migrations
                         new
                         {
                             UserID = 1,
-                            Email = "Mail1",
+                            Email = "Mail1@Example.com",
                             OrganizationID = 1,
                             Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 1
@@ -183,7 +183,7 @@ namespace EFrameWork.Migrations
                         new
                         {
                             UserID = 2,
-                            Email = "Mail2",
+                            Email = "Mail2@Example.com",
                             OrganizationID = 1,
                             Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 2,
@@ -192,7 +192,7 @@ namespace EFrameWork.Migrations
                         new
                         {
                             UserID = 3,
-                            Email = "Mail3",
+                            Email = "Mail3@Example.com",
                             OrganizationID = 1,
                             Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 3,
