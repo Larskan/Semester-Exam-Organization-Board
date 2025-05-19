@@ -10,11 +10,11 @@ namespace OrganizationBoard.IService
     public interface IAdminService
     {
         // User Management
-        Task<OperationResponse<User>> CreateUser(User user, int requestingAdminId);
-        Task<OperationResponse<User>> GetUser(int userId, int requestingAdminId);
-        Task<OperationResponse<User>> UpdateUser(User user, int requestingAdminId);
+        Task<OperationResponse<UserDto>> CreateUser(UserDto user, int requestingAdminId);
+        Task<OperationResponse<UserDto>> GetUser(int userId, int requestingAdminId);
+        Task<OperationResponse<UserDto>> UpdateUser(UserDto user, int requestingAdminId);
         Task<OperationResponse<bool>> DeleteUser(int userId, int requestingAdminId);
-        Task<OperationResponse<List<User>>> GetAllUsers(int requestingAdminId);
+        Task<OperationResponse<List<UserDto>>> GetAllUsers(int requestingAdminId);
 
         //Organization Management
         Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId);
