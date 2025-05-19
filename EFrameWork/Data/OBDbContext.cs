@@ -93,10 +93,11 @@ namespace EFramework.Data
                 new Status { StatusID = 4, TaskStatus = "Confirmed" }
             );
 
+            // Pass = 1234
             modelBuilder.Entity<User>().HasData(
-                new User {UserID = 1, Email = "Mail1", Password = "1234", RoleID = 1, OrganizationID = 1},
-                new User {UserID = 2, Email = "Mail2", Password = "1234", TeamID = 2, RoleID = 2, OrganizationID = 1},
-                new User {UserID = 3, Email = "Mail3", Password = "1234", TeamID = 1, RoleID = 3, OrganizationID = 1}
+                new User {UserID = 1, Email = "Mail1", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", RoleID = 1, OrganizationID = 1},
+                new User {UserID = 2, Email = "Mail2", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", TeamID = 2, RoleID = 2, OrganizationID = 1},
+                new User {UserID = 3, Email = "Mail3", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", TeamID = 1, RoleID = 3, OrganizationID = 1}
             );
         }
     }

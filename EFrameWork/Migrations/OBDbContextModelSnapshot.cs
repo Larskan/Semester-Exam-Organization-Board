@@ -174,7 +174,7 @@ namespace EFrameWork.Migrations
                             UserID = 1,
                             Email = "Mail1",
                             OrganizationID = 1,
-                            Password = "1234",
+                            Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 1
                         },
                         new
@@ -182,7 +182,7 @@ namespace EFrameWork.Migrations
                             UserID = 2,
                             Email = "Mail2",
                             OrganizationID = 1,
-                            Password = "1234",
+                            Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 2,
                             TeamID = 2
                         },
@@ -191,7 +191,7 @@ namespace EFrameWork.Migrations
                             UserID = 3,
                             Email = "Mail3",
                             OrganizationID = 1,
-                            Password = "1234",
+                            Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 3,
                             TeamID = 1
                         });
