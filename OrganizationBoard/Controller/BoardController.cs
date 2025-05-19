@@ -9,7 +9,7 @@ using OrganizationBoard.DTO;
 
 namespace OrganizationBoard.Controller
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class BoardController : ControllerBase
@@ -24,6 +24,7 @@ namespace OrganizationBoard.Controller
         #region Board Management
 
         [HttpGet("GetBoard/{boardId}")]
+        [Authorize(Roles = "Team Leader, Team Member")]
         public async Task<IActionResult> GetBoard(int boardId, int userId)
         {
             var result = await _boardService.GetBoard(boardId, userId);
@@ -35,6 +36,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpGet("GetTeamBoards/{teamId}")]
+        [Authorize(Roles = "Team Leader, Team Member")]
         public async Task<IActionResult> GetTeamBoards(int teamId, int userId)
         {
             var result = await _boardService.GetTeamBoards(teamId, userId);
@@ -47,6 +49,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpPost("CreateBoard")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> CreateBoard([FromBody] BoardDto board, int userId)
         {
             var result = await _boardService.CreateBoard(board, userId);
@@ -59,6 +62,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpPut("UpdateBoard")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> UpdateBoard([FromBody] BoardReadDto board, int userId)
         {
             var result = await _boardService.UpdateBoard(board, userId);
@@ -71,6 +75,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpDelete("DeleteBoard/{boardId}")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> DeleteBoard(int boardId, int userId)
         {
             var result = await _boardService.DeleteBoard(boardId, userId);
@@ -82,6 +87,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpGet("GetBoardTasks/{boardId}")]
+        [Authorize(Roles = "Team Leader, Team Member")]
         public async Task<IActionResult> GetBoardTasks(int boardId, int userId)
         {
             var result = await _boardService.GetBoardTasks(boardId, userId);
@@ -98,6 +104,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpPost("CreateTask")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> CreateTask([FromBody] TaskDto task, int boardId, int userId)
         {
             var result = await _boardService.CreateTask(task, boardId, userId);
@@ -109,6 +116,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpGet("GetTask/{taskId}")]
+        [Authorize(Roles = "Team Leader, Team Member")]
         public async Task<IActionResult> GetTask(int taskId, int userId)
         {
             var result = await _boardService.GetTask(taskId, userId);
@@ -121,6 +129,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpPut("UpdateTask")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> UpdateTask([FromBody] TaskReadDto task, int userId)
         {
             var result = await _boardService.UpdateTask(task, userId);
@@ -133,6 +142,7 @@ namespace OrganizationBoard.Controller
 
         // [Authorize(Roles = "Team Leader")]
         [HttpDelete("DeleteTask/{taskId}")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> DeleteTask(int taskId, int userId)
         {
             var result = await _boardService.DeleteTask(taskId, userId);
@@ -144,6 +154,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpPost("AssignTask/{taskId}/{assignedToUserId}")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> AssignTask(int taskId, int userId, int assignedToUserId)
         {
             var result = await _boardService.AssignTask(taskId, userId, assignedToUserId);
@@ -155,6 +166,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpPost("MarkTaskAsComplete/{taskId}")]
+        [Authorize(Roles = "Team Leader, Team Member")]
         public async Task<IActionResult> MarkTaskAsComplete(int taskId, int userId)
         {
             var result = await _boardService.MarkTaskAsComplete(taskId, userId);
@@ -165,6 +177,7 @@ namespace OrganizationBoard.Controller
             return BadRequest(result.Message);
         }
         [HttpPost("ConfirmTaskCompletion/{taskId}")]
+        [Authorize(Roles = "Team Leader")]
         public async Task<IActionResult> ConfirmTaskCompletion(int taskId, int userId)
         {
             var result = await _boardService.ConfirmTaskCompletion(taskId, userId);

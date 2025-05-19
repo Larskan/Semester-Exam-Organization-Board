@@ -34,12 +34,12 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
         {
-            new OpenApiSecurityScheme 
+            new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference 
-                { 
-                    Type = ReferenceType.SecurityScheme, 
-                    Id = "Bearer" 
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 },
                 Scheme = "oauth2",
                 Name = "Bearer",
@@ -51,6 +51,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenCreation, TokenCreation>();
 builder.Services.AddScoped<IBCryptService, BCryptService>();
