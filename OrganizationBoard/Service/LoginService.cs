@@ -65,6 +65,7 @@ namespace OrganizationBoard.Service
                 var email = dto.Email?.Trim();
                 var orgName = dto.OrgName?.Trim();
 
+                // LINQ and EFramework stops SQL injections
                 bool emailExists = await _db.UserTables!.AnyAsync(u => u.Email == email);
 
                 if (emailExists)
