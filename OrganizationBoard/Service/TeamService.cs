@@ -68,17 +68,16 @@ namespace OrganizationBoard.Service
         // Test: existingTeam as null = 404
         // Test: existingTeam as valid team 
         // Test: failing to update team = 500
-        public async Task<OperationResponse<TeamDto>> UpdateTeam(TeamDto team, int requestingUserId)
+        public async Task<OperationResponse<TeamDto>> UpdateTeamName(TeamDto team, int requestingUserId)
         {
-
-            if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<TeamDto>("Only team leaders can update teams.", false, 403);
-
             try
             {
                 var existingTeam = _context.TeamTables!.FirstOrDefault(t => t.TeamID == team.TeamID);
                 if (existingTeam == null)
                     return new OperationResponse<TeamDto>("Team not found.", false, 404);
+
+                if (!await IsUserTeamLeader(requestingUserId))
+                return new OperationResponse<TeamDto>("Access Denied.", false, 403);
 
                 existingTeam.TeamName = team.TeamName;
                 await _context.SaveChangesAsync();
@@ -124,25 +123,35 @@ namespace OrganizationBoard.Service
         // Test: Members as null and members.Count == 0 = 404
         // Test: Members as valid members
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<List<User>>> GetTeamMembers(int teamId, int requestingUserId)
+        public async Task<OperationResponse<List<UserDto>>> GetTeamMembers(int teamId, int requestingUserId)
         {
             if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<List<User>>("Access Denied.", false, 403);
+                return new OperationResponse<List<UserDto>>("Access Denied.", false, 403);
 
             if (!await IsUserTeamMember(requestingUserId, teamId))
-                return new OperationResponse<List<User>>("Access Denied.", false, 403);
+                return new OperationResponse<List<UserDto>>("Access Denied.", false, 403);
 
             try
             {
                 var members = _context.UserTables!.Where(u => u.TeamID == teamId).ToList();
                 if (members == null || members.Count == 0)
-                    return new OperationResponse<List<User>>("No members found in this team.", false, 404);
+                    return new OperationResponse<List<UserDto>>("No members found in this team.", false, 404);
+                
+                var memberDtos = members.Select(u => new UserDto
+                {
+                    UserID = u.UserID,
+                    Email = u.Email,
+                    Password = u.Password,
+                    RoleID = u.RoleID,
+                    OrganizationID = u.OrganizationID,
+                    TeamID = u.TeamID
+                }).ToList();
 
-                return new OperationResponse<List<User>>(members, "Members retrieved successfully.");
+                return new OperationResponse<List<UserDto>>(memberDtos, "Members retrieved successfully.");
             }
             catch (Exception ex)
             {
-                return new OperationResponse<List<User>>(ex.Message, false, 500);
+                return new OperationResponse<List<UserDto>>(ex.Message, false, 500);
             }
         }
 

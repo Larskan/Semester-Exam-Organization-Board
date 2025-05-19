@@ -102,7 +102,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new TeamDto { TeamName = "Dev Team" }, 3);
+            var result = await service.UpdateTeamName(new TeamDto { TeamName = "Dev Team" }, 3);
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -118,7 +118,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new TeamDto { TeamID = 999, TeamName = "Nonexistent Team" }, 2);
+            var result = await service.UpdateTeamName(new TeamDto { TeamID = 999, TeamName = "Nonexistent Team" }, 2);
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -134,7 +134,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new TeamDto { TeamID = 2, TeamName = "Updated Team" }, 4);
+            var result = await service.UpdateTeamName(new TeamDto { TeamID = 2, TeamName = "Updated Team" }, 4);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -154,7 +154,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeam(new TeamDto { TeamID = 2, TeamName = "Team 3" }, 4);
+            var result = await service.UpdateTeamName(new TeamDto { TeamID = 2, TeamName = "Team 3" }, 4);
 
             // Assert
             Assert.False(result.IsSuccess);
