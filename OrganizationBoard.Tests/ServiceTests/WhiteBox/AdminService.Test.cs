@@ -7,7 +7,7 @@ using OrganizationBoard.DTO;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
-    public class AdminServiceTest
+    public class AdminServiceTest // Done: 0/22
     {
         private OBDbContext GetInMemoryDbContext(string dbName = "TeamServiceTests")
         {
