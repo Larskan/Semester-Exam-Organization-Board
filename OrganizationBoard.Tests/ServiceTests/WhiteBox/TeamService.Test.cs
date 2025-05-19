@@ -102,7 +102,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.UpdateTeamName(new TeamDto { TeamName = "Dev Team" }, 3);
+            var result = await service.UpdateTeamName(new TeamDto { TeamName = "Team 1" }, 3);
 
             // Assert
             Assert.False(result.IsSuccess);

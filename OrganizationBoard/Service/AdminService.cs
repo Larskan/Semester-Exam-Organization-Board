@@ -25,9 +25,10 @@ namespace OrganizationBoard.Service
         }
 
         #region User Management
-        // 1 Decsision = 2 Tests
+        // 2 Decisions = 3 Tests
         // Test: Admin as valid user, set to False = 403.
         // Test: Admin as valid user, creating new user
+        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<UserDto>> CreateUser(UserDto user, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
@@ -151,34 +152,42 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 1 Decision = 2 Tests
+        // 2 Decisions = 3 Tests
         // Test: Admin as valid user, set to False = 403.
         // Test: Admin as valid user, getting all users
+        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<List<UserDto>>> GetAllUsers(int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
                 return new OperationResponse<List<UserDto>>("Access Denied", false, 403);
 
-            var users = await _context.UserTables!.Select(u => new UserDto
+            try
             {
-                UserID = u.UserID,
-                Email = u.Email,
-                Password = u.Password,
-                RoleID = u.RoleID,
-                OrganizationID = u.OrganizationID,
-                TeamID = u.TeamID
-            }).ToListAsync();
+                var users = await _context.UserTables!.Select(u => new UserDto
+                {
+                    UserID = u.UserID,
+                    Email = u.Email,
+                    Password = u.Password,
+                    RoleID = u.RoleID,
+                    OrganizationID = u.OrganizationID,
+                    TeamID = u.TeamID
+                }).ToListAsync();
 
-            return new OperationResponse<List<UserDto>>(users);
+                return new OperationResponse<List<UserDto>>(users);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<List<UserDto>>(ex.Message, false, 500);
+            }
         }
         #endregion User Management
 
-        #region Organization Management
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: existingOrg as null = 404
-        // Test: existingOrg as valid org
-        // Test: failing to update org = 500
+            #region Organization Management
+            // 3 Decisions = 4 Tests
+            // Test: Admin as valid user, set to False = 403.
+            // Test: existingOrg as null = 404
+            // Test: existingOrg as valid org
+            // Test: failing to update org = 500
         public async Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))

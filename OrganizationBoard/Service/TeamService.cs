@@ -70,14 +70,13 @@ namespace OrganizationBoard.Service
         // Test: failing to update team = 500
         public async Task<OperationResponse<TeamDto>> UpdateTeamName(TeamDto team, int requestingUserId)
         {
+            if (!await IsUserTeamLeader(requestingUserId))
+                    return new OperationResponse<TeamDto>("Access Denied.", false, 403);
             try
             {
                 var existingTeam = _context.TeamTables!.FirstOrDefault(t => t.TeamID == team.TeamID);
                 if (existingTeam == null)
                     return new OperationResponse<TeamDto>("Team not found.", false, 404);
-
-                if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<TeamDto>("Access Denied.", false, 403);
 
                 existingTeam.TeamName = team.TeamName;
                 await _context.SaveChangesAsync();
@@ -125,18 +124,17 @@ namespace OrganizationBoard.Service
         // Test: Exception in try/catch = 500
         public async Task<OperationResponse<List<UserDto>>> GetTeamMembers(int teamId, int requestingUserId)
         {
-            if (!await IsUserTeamLeader(requestingUserId))
+            if (!await IsUserTeamLeader(requestingUserId) && !await IsUserTeamMember(requestingUserId, teamId))
+            {
                 return new OperationResponse<List<UserDto>>("Access Denied.", false, 403);
-
-            if (!await IsUserTeamMember(requestingUserId, teamId))
-                return new OperationResponse<List<UserDto>>("Access Denied.", false, 403);
+            }
 
             try
             {
                 var members = _context.UserTables!.Where(u => u.TeamID == teamId).ToList();
                 if (members == null || members.Count == 0)
                     return new OperationResponse<List<UserDto>>("No members found in this team.", false, 404);
-                
+
                 var memberDtos = members.Select(u => new UserDto
                 {
                     UserID = u.UserID,
