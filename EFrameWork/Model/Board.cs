@@ -7,18 +7,17 @@ using System.Threading.Tasks;
 
 namespace EFrameWork.Model
 {
-    public class Board
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int BoardID { get; set; }
-        [Required]
-        public string BoardName { get; set; }
-        public int? TeamID { get; set; }
-        [ForeignKey("TeamID")]
-        public Team Team { get; set; }
-        
-        public ICollection<Task>? Tasks { get; set; }
+        public class Board
+        {
+                [Key]
+                [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+                public int BoardID { get; set; }
+                [Required]
+                public string BoardName { get; set; }
+                public int? TeamID { get; set; }
+                [ForeignKey("TeamID")]
+                public Team? Team { get; set; }
 
-    }
+                public ICollection<Task>? Tasks { get; set; }
+        }
 }

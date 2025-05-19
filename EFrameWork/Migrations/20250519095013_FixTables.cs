@@ -7,7 +7,7 @@
 namespace EFrameWork.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class FixTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,7 +44,7 @@ namespace EFrameWork.Migrations
                 {
                     StatusID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -189,6 +189,17 @@ namespace EFrameWork.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "StatusTables",
+                columns: new[] { "StatusID", "Status" },
+                values: new object[,]
+                {
+                    { 1, "To Do" },
+                    { 2, "In Progress" },
+                    { 3, "Done" },
+                    { 4, "Confirmed" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "TeamTables",
                 columns: new[] { "TeamID", "TeamName" },
                 values: new object[,]
@@ -202,9 +213,9 @@ namespace EFrameWork.Migrations
                 columns: new[] { "UserID", "Email", "OrganizationID", "Password", "RoleID", "TeamID" },
                 values: new object[,]
                 {
-                    { 1, "Mail1", 1, "1234", 1, null },
-                    { 2, "Mail2", 1, "1234", 2, 2 },
-                    { 3, "Mail3", 1, "1234", 3, 1 }
+                    { 1, "Mail1", 1, "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", 1, null },
+                    { 2, "Mail2", 1, "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", 2, 2 },
+                    { 3, "Mail3", 1, "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", 3, 1 }
                 });
 
             migrationBuilder.CreateIndex(

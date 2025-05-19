@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using EFramework.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using OrganizationBoard.IService;
+using OrganizationBoard.Service;
 using Polly;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -32,12 +34,12 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
         {
-            new OpenApiSecurityScheme 
+            new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference 
-                { 
-                    Type = ReferenceType.SecurityScheme, 
-                    Id = "Bearer" 
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 },
                 Scheme = "oauth2",
                 Name = "Bearer",
@@ -49,11 +51,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenCreation, TokenCreation>();
 builder.Services.AddScoped<IBCryptService, BCryptService>();
 builder.Services.AddSingleton<IRsaService, RsaService>();
-
 
 var configuration = builder.Configuration;
 builder.Services.AddDbContext<OBDbContext>(options =>

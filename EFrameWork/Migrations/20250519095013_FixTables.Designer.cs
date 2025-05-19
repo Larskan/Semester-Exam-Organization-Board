@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFrameWork.Migrations
 {
     [DbContext(typeof(OBDbContext))]
-    [Migration("20250515092236_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250519095013_FixTables")]
+    partial class FixTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,7 +177,7 @@ namespace EFrameWork.Migrations
                             UserID = 1,
                             Email = "Mail1",
                             OrganizationID = 1,
-                            Password = "1234",
+                            Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 1
                         },
                         new
@@ -185,7 +185,7 @@ namespace EFrameWork.Migrations
                             UserID = 2,
                             Email = "Mail2",
                             OrganizationID = 1,
-                            Password = "1234",
+                            Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 2,
                             TeamID = 2
                         },
@@ -194,7 +194,7 @@ namespace EFrameWork.Migrations
                             UserID = 3,
                             Email = "Mail3",
                             OrganizationID = 1,
-                            Password = "1234",
+                            Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW",
                             RoleID = 3,
                             TeamID = 1
                         });
@@ -266,13 +266,36 @@ namespace EFrameWork.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StatusID"));
 
-                    b.Property<int>("StatusOption")
-                        .HasColumnType("int")
+                    b.Property<string>("TaskStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("Status");
 
                     b.HasKey("StatusID");
 
                     b.ToTable("StatusTables");
+
+                    b.HasData(
+                        new
+                        {
+                            StatusID = 1,
+                            TaskStatus = "To Do"
+                        },
+                        new
+                        {
+                            StatusID = 2,
+                            TaskStatus = "In Progress"
+                        },
+                        new
+                        {
+                            StatusID = 3,
+                            TaskStatus = "Done"
+                        },
+                        new
+                        {
+                            StatusID = 4,
+                            TaskStatus = "Confirmed"
+                        });
                 });
 
             modelBuilder.Entity("EFrameWork.Model.Board", b =>

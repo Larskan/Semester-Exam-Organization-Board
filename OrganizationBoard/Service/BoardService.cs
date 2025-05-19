@@ -7,46 +7,541 @@ using Microsoft.EntityFrameworkCore;
 using EFramework.Data;
 using OrganizationBoard.IService;
 using EFrameWork.Model;
+using Polly;
+
 
 namespace OrganizationBoard.Service
 {
-    public class BoardService //: IBoardService
+    public class BoardService : IBoardService
     {
         private readonly OBDbContext _context;
-        public BoardService(OBDbContext context)
+        private readonly IAsyncPolicy _retryPolicy;
+        public BoardService(OBDbContext context, IAsyncPolicy retryPolicy)
         {
+            _retryPolicy = retryPolicy;
             _context = context;
         }
 
-        private async Task<bool> IsUserAdmin(int userId){
-            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
-            return user != null && user.RoleID == 1;
+
+        #region Private check Methods
+        // private async Task<bool> IsUserInOrganization(int userId, int organizationId)
+        // {
+        //     var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
+        //     return user != null && user.OrganizationID == organizationId;
+        // }
+        private async Task<bool> IsUserInTeam(int userId, int teamId)
+        {
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
+            return user != null && user.TeamID == teamId;
         }
-        private async Task<bool> IsUserTeamLeader(int userId){
-            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
+
+        private async Task<bool> IsUserTeamLeader(int userId)
+        {
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
             return user != null && user.RoleID == 2;
         }
-        private async Task<bool> IsUserTeamMember(int userId){
-            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
-            return user != null && user.RoleID == 3;
-        }
-
-        public async Task<OperationResponse<Board>> CreateBoard(Board board, int requestingUserId)
+        private async Task<bool> IsUserTeamMember(int userId, int boardId)
         {
-            // Only Team Leaders can create boards
-            if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<Board>("Access Denied", false, 403);
-            
-            var newBoard = new Board
-            {
-                BoardName = board.BoardName,
-                TeamID = board.TeamID
-            };
-            _context.BoardTables!.Add(newBoard);
-            await _context.SaveChangesAsync();
+            var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
+            var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
 
-            board.BoardID = newBoard.BoardID;
-            return new OperationResponse<Board>(board, "Board created successfully");
+            if (board == null || user == null)
+                return false;
+
+            return user.TeamID == board.TeamID;
         }
+
+        private async Task<bool> IsUserInTask(int userId, int taskId)
+        {
+            var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
+            return task != null && task.UserAssignments!.Any(ua => ua.UserID == userId);
+        }
+        #endregion
+
+        #region Board Management
+        // 3 Decisions = 4 Tests
+        // Test: Leader as valid user, set to False = 403.
+        // Test: User as null, return 404
+        // Test: User as valid user, creating new board
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<BoardDto>> CreateBoard(BoardDto board, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    // Only Team Leaders can create boards
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<BoardDto>("Access Denied", false, 403);
+
+                    var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == requestingUserId);
+                    if (user == null)
+                        return new OperationResponse<BoardDto>("User not found", false, 404);
+
+                    var newBoard = new Board
+                    {
+                        BoardName = board.BoardName,
+                        TeamID = user.TeamID,
+                    };
+                    _context.BoardTables!.Add(newBoard);
+                    await _context.SaveChangesAsync();
+
+                    board.BoardID = newBoard.BoardID;
+
+                    return new OperationResponse<BoardDto>(board, "Board created successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<BoardDto>(ex.Message, false, 500);
+            }
+        }
+
+        // 4 Decisions = 5 Tests
+        // Test: Team Member access, set to False = 403.
+        // Test: Tasks as null, return 404
+        // Test: Tasks as empty, return 404
+        // Test: Success, getting all tasks. 
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<List<TaskReadDto>>> GetBoardTasks(int boardId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    if (!await IsUserTeamMember(requestingUserId, boardId))
+                        return new OperationResponse<List<TaskReadDto>>("Access Denied", false, 403);
+
+                    var tasks = _context.TaskTables!.Where(t => t.BoardID == boardId).ToList();
+                    if (tasks == null || tasks.Count == 0)
+                        return new OperationResponse<List<TaskReadDto>>("No tasks found", false, 404);
+
+                    var taskDtos = tasks.Select(t => new TaskReadDto
+                    {
+                        TaskID = t.TaskID,
+                        Title = t.Title,
+                        Description = t.Description,
+                        Estimation = t.Estimation,
+                        NumUser = t.NumUser,
+                        StatusID = t.StatusID,
+                        BoardID = t.BoardID,
+                    }).ToList();
+
+                    return new OperationResponse<List<TaskReadDto>>(taskDtos, "Tasks retrieved successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<List<TaskReadDto>>(ex.Message, false, 500);
+            }
+        }
+
+        // 4 Decisions = 5 Tests.
+        // Test: existingBoard as null, return 404
+        // Test: Team Leader access, denied, return 403
+        // Test: Team Member access, denied, return 403
+        // Test: Successfully updated board
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<BoardReadDto>> UpdateBoard(BoardReadDto board, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var existingBoard = _context.BoardTables!.FirstOrDefault(b => b.BoardID == board.BoardID);
+                    if (existingBoard == null)
+                        return new OperationResponse<BoardReadDto>("Board not found", false, 404);
+
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
+
+                    if (!await IsUserTeamMember(requestingUserId, board.BoardID))
+                        return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
+
+
+                    existingBoard.BoardName = board.BoardName;
+                    _context.SaveChanges();
+                    return new OperationResponse<BoardReadDto>(board, "Board updated successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<BoardReadDto>(ex.Message, false, 500);
+            }
+
+        }
+
+        // 5 Decisions = 6 Tests.
+        // Test: Board as null, return 404
+        // Test: Team Leader access, denied, return 403
+        // Test: Team Member access, denied, return 403
+        // Test: Successfully deleted board
+        // Test: Board has tasks, delete tasks first
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<bool>> DeleteBoard(int boardId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var board = _context.BoardTables!.FirstOrDefault(b => b.BoardID == boardId);
+                    if (board == null)
+                        return new OperationResponse<bool>("Board not found", false, 404);
+
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<bool>("Access Denied", false, 403);
+
+                    if (!await IsUserTeamMember(requestingUserId, boardId))
+                        return new OperationResponse<bool>("Access Denied", false, 403);
+
+                    // Check if the board has any tasks
+                    if (_context.TaskTables!.Any(t => t.BoardID == boardId))
+                        _context.TaskTables!.RemoveRange(_context.TaskTables.Where(t => t.BoardID == boardId));
+
+                    _context.BoardTables!.Remove(board);
+                    await _context.SaveChangesAsync();
+
+                    return new OperationResponse<bool>(true, "Board deleted successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }
+        }
+
+        // 4 Decisions = 5 Tests
+        // Test: Board as null, return 404
+        // Test: TeamID as null, return 404
+        // Test: Team Member access, denied, return 403
+        // Test: Successfully retrieved board
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<BoardReadDto>> GetBoard(int boardId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
+                    if (board == null || board.TeamID == null)
+                        return new OperationResponse<BoardReadDto>("Board not found", false, 404);
+
+                    if (!await IsUserTeamMember(requestingUserId, boardId))
+                        return new OperationResponse<BoardReadDto>("Access Denied", false, 403);
+
+                    var boardDto = new BoardReadDto
+                    {
+                        BoardID = board.BoardID,
+                        BoardName = board.BoardName,
+                        TeamID = board.TeamID
+                    };
+
+                    return new OperationResponse<BoardReadDto>(boardDto, "Board retrieved successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<BoardReadDto>(ex.Message, false, 500);
+            }
+        }
+
+        // 4 Decisions = 5 Tests
+        // Test: Team Member access, set to False = 403.
+        // Test: Boards as null, return 404
+        // Test: Boards as empty, return 404
+        // Test: Success, getting all boards.
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<List<BoardReadDto>>> GetTeamBoards(int teamId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    if (!await IsUserInTeam(requestingUserId, teamId))
+                        return new OperationResponse<List<BoardReadDto>>("Access Denied", false, 403);
+
+                    var boards = await _context.BoardTables!.Where(b => b.TeamID == teamId).ToListAsync();
+                    if (boards == null || boards.Count == 0)
+                        return new OperationResponse<List<BoardReadDto>>("No boards found", false, 404);
+
+                    var boardDtos = boards.Select(b => new BoardReadDto
+                    {
+                        BoardID = b.BoardID,
+                        BoardName = b.BoardName,
+                        TeamID = b.TeamID
+                    }).ToList();
+
+                    return new OperationResponse<List<BoardReadDto>>(boardDtos);
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<List<BoardReadDto>>(ex.Message, false, 500);
+            }
+        }
+
+        #endregion
+
+        #region Task Management
+        // 3 Decisions = 4 Tests
+        // Test: Board as null, return 404
+        // Test: Team Leader access, denied, return 403
+        // Test: Create new task successfully
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<TaskDto>> CreateTask(TaskDto task, int boardId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
+                    if (board == null)
+                        return new OperationResponse<TaskDto>("Board not found", false, 404);
+                    // Only Team Leaders can create tasks
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<TaskDto>("Access Denied", false, 403);
+
+                    var newTask = new EFrameWork.Model.Task
+                    {
+                        Title = task.Title,
+                        Description = task.Description,
+                        BoardID = boardId,
+                        StatusID = 1,
+                        Estimation = task.Estimation,
+                        NumUser = task.NumUser,
+                    };
+                    _context.TaskTables!.Add(newTask);
+                    await _context.SaveChangesAsync();
+
+                    task.TaskID = newTask.TaskID;
+
+                    return new OperationResponse<TaskDto>(task, "Task created successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<TaskDto>(ex.Message, false, 500);
+            }
+        }
+
+        // 2 Decisions = 3 Tests
+        // Test: Task as null, return 404
+        // Test: Successfully retrieved task
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<TaskReadDto>> GetTask(int taskId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
+                    if (task == null)
+                        return new OperationResponse<TaskReadDto>("Task not found", false, 404);
+
+                    var taskDto = new TaskReadDto
+                    {
+                        TaskID = task.TaskID,
+                        Title = task.Title,
+                        Description = task.Description,
+                        Estimation = task.Estimation,
+                        NumUser = task.NumUser,
+                        StatusID = task.StatusID,
+                    };
+
+                    return new OperationResponse<TaskReadDto>(taskDto, "Task retrieved successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<TaskReadDto>(ex.Message, false, 500);
+            }
+        }
+
+        // 3 Decisions = 4 Tests
+        // Test: Leader as valid user, set to False = 403.
+        // Test: existingTask as null = 404
+        // Test: Successfully updated task
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<TaskReadDto>> UpdateTask(TaskReadDto task, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    // Only Team Leaders can update tasks
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<TaskReadDto>("Access Denied", false, 403);
+
+                    var existingTask = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == task.TaskID);
+                    if (existingTask == null)
+                        return new OperationResponse<TaskReadDto>("Task not found", false, 404);
+
+
+                    existingTask.Title = task.Title;
+                    existingTask.Description = task.Description;
+                    existingTask.Estimation = task.Estimation;
+                    existingTask.NumUser = task.NumUser;
+
+                    await _context.SaveChangesAsync();
+
+                    var updatedTaskDto = new TaskReadDto
+                    {
+                        TaskID = existingTask.TaskID,
+                        Title = existingTask.Title,
+                        Description = existingTask.Description,
+                        Estimation = existingTask.Estimation,
+                        NumUser = existingTask.NumUser,
+                        StatusID = existingTask.StatusID,
+                    };
+
+                    return new OperationResponse<TaskReadDto>(updatedTaskDto, "Task updated successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<TaskReadDto>(ex.Message, false, 500);
+            }
+        }
+
+        // 3 Decisions = 4 Tests
+        // Test: Leader as valid user, set to False = 403.
+        // Test: task as null = 404
+        // Test: Successfully deleted task
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<bool>> DeleteTask(int taskId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    // Only Team Leaders can delete tasks
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<bool>("Access Denied", false, 403);
+
+                    var task = _context.TaskTables!.FirstOrDefault(t => t.TaskID == taskId);
+                    if (task == null)
+                        return new OperationResponse<bool>("Task not found", false, 404);
+
+                    _context.TaskTables!.Remove(task);
+                    _context.SaveChanges();
+
+                    return new OperationResponse<bool>(true, "Task deleted successfully");
+                });
+
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }
+        }
+
+        // 4 Decisions = 5 Tests
+        // Test: Leader as valid user, set to False = return 403.
+        // Test: task as null = 404
+        // Test: user as null = 404
+        // Test: Successfully assigned task
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<bool>> AssignTask(int taskId, int requestingUserId, int assignedToUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<bool>("Access Denied", false, 403);
+
+                    var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
+                    if (task == null)
+                        return new OperationResponse<bool>("Task not found", false, 404);
+
+                    var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == assignedToUserId);
+                    if (user == null)
+                        return new OperationResponse<bool>("User not found", false, 404);
+
+                    var newAssignment = new UserToTask
+                    {
+                        UserID = assignedToUserId,
+                        TaskID = taskId
+                    };
+
+                    task.UserAssignments!.Add(newAssignment);
+                    await _context.SaveChangesAsync();
+
+                    return new OperationResponse<bool>(true, "Task assigned successfully");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }
+        }
+
+        // 3 Decisions = 4 Tests
+        // Test: Task as null, return 404
+        // Test: IsUserInTask fails, return 403
+        // Test: Successfully marked task as complete
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<bool>> MarkTaskAsComplete(int taskId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
+                    if (task == null)
+                    {
+                        return new OperationResponse<bool>("Task not found", false, 404);
+                    }
+
+                    // Only Team Members assigned to the task can mark it as complete
+                    if (!await IsUserInTask(requestingUserId, taskId))
+                    {
+                        return new OperationResponse<bool>("Access Denied", false, 403);
+                    }
+
+                    task.StatusID = 2; // Assuming 2 is the ID for "Done"
+                    await _context.SaveChangesAsync();
+
+                    return new OperationResponse<bool>(true, "Task marked as complete");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }
+        }
+
+        // 3 Decisions = 4 Tests
+        // Test: Team Leader access, set to False = 403.
+        // Test: task as null = 404
+        // Test: Successfully confirmed task completion
+        // Test: Exception in try/catch = 500
+        public async Task<OperationResponse<bool>> ConfirmTaskCompletion(int taskId, int requestingUserId)
+        {
+            try
+            {
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<bool>("Access Denied", false, 403);
+
+                    var task = await _context.TaskTables!.FirstOrDefaultAsync(t => t.TaskID == taskId);
+                    if (task == null)
+                        return new OperationResponse<bool>("Task not found", false, 404);
+
+                    task.StatusID = 3; // Assuming 3 is the ID for "Confirmed"
+                    await _context.SaveChangesAsync();
+
+                    return new OperationResponse<bool>(true, "Task completion confirmed");
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return new OperationResponse<bool>(ex.Message, false, 500);
+            }
+        }
+
+        #endregion
+
     }
 }
