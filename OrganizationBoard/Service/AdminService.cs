@@ -13,11 +13,13 @@ namespace OrganizationBoard.Service
     public class AdminService : IAdminService
     {
         private readonly OBDbContext _context;
-        public AdminService(OBDbContext context)
+        private readonly IBCryptService _bCryptService;
+        public AdminService(OBDbContext context, IBCryptService bCryptService)
         {
             _context = context;
+            _bCryptService = bCryptService;
         }
-        
+
         // V01 - TA01 - Elevation: Member has access to Lead/Admin perms
         private async Task<bool> IsUserAdmin(int userId){
             var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
@@ -29,18 +31,23 @@ namespace OrganizationBoard.Service
         // Test: Admin as valid user, set to False = 403.
         // Test: Admin as valid user, creating new user
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<UserDto>> CreateUser(UserDto user, int requestingAdminId)
+        public async Task<OperationResponse<UserCreateDto>> CreateUser(UserCreateDto user, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
-                return new OperationResponse<UserDto>("Access Denied", false, 403);
+                return new OperationResponse<UserCreateDto>("Access Denied", false, 403);
 
+            var hashedPassword = _bCryptService.HashPassword(user.Password);
             try
             {
+                bool emailExists = await _context.UserTables!.AnyAsync(u => u.Email == user.Email);
+
+                if (emailExists)
+                    return new OperationResponse<UserCreateDto>("Email already exists", false, 400);
 
                 var newUser = new User
                 {
                     Email = user.Email,
-                    Password = user.Password,
+                    Password = hashedPassword,
                     RoleID = user.RoleID,
                     OrganizationID = user.OrganizationID,
                     TeamID = user.TeamID
@@ -48,12 +55,11 @@ namespace OrganizationBoard.Service
                 _context.UserTables!.Add(newUser);
                 await _context.SaveChangesAsync();
 
-                user.UserID = newUser.UserID;
-                return new OperationResponse<UserDto>(user, "User created successfully");
+                return new OperationResponse<UserCreateDto>(user, "User created successfully");
             }
             catch (Exception ex)
             {
-                return new OperationResponse<UserDto>(ex.Message, false, 500);
+                return new OperationResponse<UserCreateDto>(ex.Message, false, 500);
             }
         }
 
@@ -63,31 +69,38 @@ namespace OrganizationBoard.Service
         // Test: existingUser as null = 404
         // Test: existingUser as valid user
         // Test: failing to update user = 500
-        public async Task<OperationResponse<UserDto>> UpdateUser(UserDto user, int requestingAdminId)
+        public async Task<OperationResponse<UserCreateDto>> UpdateUser(UserCreateDto user, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
-                return new OperationResponse<UserDto>("Access Denied", false, 403);
+                return new OperationResponse<UserCreateDto>("Access Denied", false, 403);
 
+            var hashedPassword = _bCryptService.HashPassword(user.Password);
             try
             {
+                bool emailExists = await _context.UserTables!.AnyAsync(u => u.Email == user.Email);
+
+        
+
                 var existingUser = await _context.UserTables!.FindAsync(user.UserID);
                 if (existingUser == null)
-                    return new OperationResponse<UserDto>("User not found", false, 404);
+                    return new OperationResponse<UserCreateDto>("User not found", false, 404);
+
+                if (emailExists && existingUser.Email != user.Email)
+                    return new OperationResponse<UserCreateDto>("Email already exists", false, 400);
 
                 existingUser.Email = user.Email;
-                existingUser.Password = user.Password;
+                existingUser.Password = hashedPassword;
                 existingUser.RoleID = user.RoleID;
-                existingUser.OrganizationID = user.OrganizationID;
                 existingUser.TeamID = user.TeamID;
 
                 _context.UserTables.Update(existingUser);
                 await _context.SaveChangesAsync();
 
-                return new OperationResponse<UserDto>(user, "User updated successfully");
+                return new OperationResponse<UserCreateDto>(user, "User updated successfully");
             }
             catch (Exception ex)
             {
-                return new OperationResponse<UserDto>(ex.Message, false, 500);
+                return new OperationResponse<UserCreateDto>(ex.Message, false, 500);
             }
         }
 
@@ -138,7 +151,6 @@ namespace OrganizationBoard.Service
                 {
                     UserID = user.UserID,
                     Email = user.Email,
-                    Password = user.Password,
                     RoleID = user.RoleID,
                     OrganizationID = user.OrganizationID,
                     TeamID = user.TeamID
@@ -146,7 +158,7 @@ namespace OrganizationBoard.Service
 
                 return new OperationResponse<UserDto>(result);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return new OperationResponse<UserDto>(ex.Message, false, 500);
             }
@@ -167,7 +179,6 @@ namespace OrganizationBoard.Service
                 {
                     UserID = u.UserID,
                     Email = u.Email,
-                    Password = u.Password,
                     RoleID = u.RoleID,
                     OrganizationID = u.OrganizationID,
                     TeamID = u.TeamID

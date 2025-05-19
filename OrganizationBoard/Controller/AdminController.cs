@@ -7,6 +7,7 @@ using OrganizationBoard.IService;
 using EFrameWork.Model;
 using Microsoft.AspNetCore.Authorization;
 using OrganizationBoard.DTO;
+using System.Security.Claims;
 
 namespace OrganizationBoard.Controller
 {
@@ -21,11 +22,25 @@ namespace OrganizationBoard.Controller
             _adminService = adminService;
         }
 
+        #region Helper Methods
+        private int GetUserIdFromClaims()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
+        }
+
+        #endregion Helper Methods
+
         #region User Management
         [HttpGet("GetUser/{userId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetUser(int userId, int adminId)
+        public async Task<IActionResult> GetUser(int userId)
         {
+            var adminId = GetUserIdFromClaims();
+            if (adminId <= 0)
+            {
+                return BadRequest("Invalid user ID.");
+            }
             var response = await _adminService.GetUser(userId, adminId);
             if (response.IsSuccess)
                 return Ok(response.Data);
@@ -44,7 +59,7 @@ namespace OrganizationBoard.Controller
 
         [HttpPost("CreateUser")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateUser([FromBody] UserDto user, int adminId)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto user, int adminId)
         {
             var response = await _adminService.CreateUser(user, adminId);
             if (response.IsSuccess)
@@ -54,7 +69,7 @@ namespace OrganizationBoard.Controller
 
         [HttpPut("UpdateUser")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDto user, int adminId)
+        public async Task<IActionResult> UpdateUser([FromBody] UserCreateDto user, int adminId)
         {
             var response = await _adminService.UpdateUser(user, adminId);
             if (response.IsSuccess)

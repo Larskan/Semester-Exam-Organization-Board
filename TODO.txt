@@ -26,6 +26,7 @@ Mangler: Tests for Login
 Mangler: Postman Testing for al API
 Mangler: Test for Public and Private Key
 
+
 - Report
 Rapport SWQ: DD Path Graphs for alle vigtige metoder, hvis nogle metoder ikke har en, forklar hvorfor.
 Rapport SWQ: Testing Methodology, overview of the testing we have done and how we did them

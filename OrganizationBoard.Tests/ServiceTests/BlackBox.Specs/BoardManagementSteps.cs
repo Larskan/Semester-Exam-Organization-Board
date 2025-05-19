@@ -32,7 +32,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox.Specs
         {
             _context = context;
             _dbContext = TestDbContextFactory.Create();
-            _service = new BoardService(_dbContext);
+            // _service = new BoardService(_dbContext);
         }
         #region Given Steps
 
