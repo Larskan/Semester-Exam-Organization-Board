@@ -37,9 +37,7 @@ namespace OrganizationBoard.Service
                     throw new UnauthorizedAccessException();
                 }
 
-                Console.WriteLine("before");
                 var decryptPassword = _rsaService.Decrypt(dto.Password);
-                Console.WriteLine("before");
                 bool valid = _bCryptService.VerifyPassword(decryptPassword, user.Password);
 
                 if (!valid)
@@ -64,6 +62,16 @@ namespace OrganizationBoard.Service
         {
             try
             {
+                var email = dto.Email?.Trim();
+                var orgName = dto.OrgName?.Trim();
+
+                bool emailExists = await _db.UserTables!.AnyAsync(u => u.Email == email);
+
+                if (emailExists)
+                {
+                    throw new ApplicationException("A user with this email already exists.");
+                }
+
                 var adminRole = await _db.RoleTables!.FirstOrDefaultAsync(r => r.RoleName == "Admin");
                 if (adminRole == null)
                 {
@@ -72,7 +80,7 @@ namespace OrganizationBoard.Service
 
                 var Organization = new Organization
                 {
-                    OrganizationName = dto.OrgName
+                    OrganizationName = orgName
                 };
 
                 await _db.OrganizationTables!.AddAsync(Organization);
@@ -81,7 +89,7 @@ namespace OrganizationBoard.Service
                 var Password = _bCryptService.HashPassword(dto.Password);
                 var user = new User
                 {
-                    Email = dto.Email,
+                    Email = email,
                     Password = Password,
                     RoleID = adminRole.RoleID,
                     OrganizationID = Organization.OrganizationID
