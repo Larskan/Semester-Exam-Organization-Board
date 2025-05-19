@@ -18,45 +18,35 @@ namespace OrganizationBoard.Service
         private readonly OBDbContext _db;
         private readonly IBCryptService _bCryptService;
         private readonly IRsaService _rsaService;
-        private readonly IAsyncPolicy _retryPolicy;
 
-        public LoginService(OBDbContext db, IBCryptService bCryptService, IRsaService rsaService, IAsyncPolicy retryPolicy)
+        public LoginService(OBDbContext db, IBCryptService bCryptService, IRsaService rsaService)
         {
-            _retryPolicy = retryPolicy;
             _bCryptService = bCryptService;
             _rsaService = rsaService;
-            _retryPolicy = retryPolicy;
             _db = db;
         }
-
-
         public async Task<User> UserCheck(LoginDto dto)
         {
             try
             {
-                return await _retryPolicy.ExecuteAsync(async () =>
+                var user = await _db.UserTables!
+                    .Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+                if (user == null)
                 {
-                    var user = await _db.UserTables!
-                        .Include(u => u.Role)
-                        .FirstOrDefaultAsync(u => u.Email == dto.Email);
+                    throw new UnauthorizedAccessException();
+                }
 
-                    if (user == null)
-                    {
-                        throw new UnauthorizedAccessException();
-                    }
+                var decryptPassword = _rsaService.Decrypt(dto.Password);
+                bool valid = _bCryptService.VerifyPassword(decryptPassword, user.Password);
 
-                    Console.WriteLine("before");
-                    var decryptPassword = _rsaService.Decrypt(dto.Password);
-                    Console.WriteLine("before");
-                    bool valid = _bCryptService.VerifyPassword(decryptPassword, user.Password);
+                if (!valid)
+                {
+                    throw new UnauthorizedAccessException();
+                }
 
-                    if (!valid)
-                    {
-                        throw new UnauthorizedAccessException();
-                    }
-
-                    return user;
-                });
+                return user;
             }
             catch (UnauthorizedAccessException)
             {
@@ -73,34 +63,42 @@ namespace OrganizationBoard.Service
         {
             try
             {
-                await _retryPolicy.ExecuteAsync(async () =>
+                var email = dto.Email?.Trim();
+                var orgName = dto.OrgName?.Trim();
+
+                // LINQ and EFramework stops SQL injections
+                bool emailExists = await _db.UserTables!.AnyAsync(u => u.Email == email);
+
+                if (emailExists)
                 {
-                    var adminRole = await _db.RoleTables!.FirstOrDefaultAsync(r => r.RoleName == "Admin");
-                    if (adminRole == null)
-                    {
-                        throw new Exception("Admin role not found in the database.");
-                    }
+                    throw new ApplicationException("A user with this email already exists.");
+                }
 
-                    var Organization = new Organization
-                    {
-                        OrganizationName = dto.OrgName
-                    };
+                var adminRole = await _db.RoleTables!.FirstOrDefaultAsync(r => r.RoleName == "Admin");
+                if (adminRole == null)
+                {
+                    throw new Exception("Admin role not found in the database.");
+                }
 
-                    await _db.OrganizationTables!.AddAsync(Organization);
-                    await _db.SaveChangesAsync();
+                var Organization = new Organization
+                {
+                    OrganizationName = orgName
+                };
 
-                    var Password = _bCryptService.HashPassword(dto.Password);
-                    var user = new User
-                    {
-                        Email = dto.Email,
-                        Password = Password,
-                        RoleID = adminRole.RoleID,
-                        OrganizationID = Organization.OrganizationID
-                    };
+                await _db.OrganizationTables!.AddAsync(Organization);
+                await _db.SaveChangesAsync();
 
-                    await _db.UserTables!.AddAsync(user);
-                    await _db.SaveChangesAsync();
-                });
+                var Password = _bCryptService.HashPassword(dto.Password);
+                var user = new User
+                {
+                    Email = email,
+                    Password = Password,
+                    RoleID = adminRole.RoleID,
+                    OrganizationID = Organization.OrganizationID
+                };
+
+                await _db.UserTables!.AddAsync(user);
+                await _db.SaveChangesAsync();
             }
             catch (Exception ex)
             {

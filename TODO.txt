@@ -1,27 +1,27 @@
 DONE: V01 - TA01 - Elevation: Member has access to Lead/Admin perms
-FIXME: V02 - TA01 - Spoof: Access to a team member
+DONE: V02 - TA01 - Spoof: Access to a team member
 DONE: V03 - TA01 - Denial: DDoS
-FIXME: V04.1 - TA01 - Tamper/Denial: SQL Injection on Organization
-FIXME: V04.2 - TA01 - Tamper/Denial: SQl Injection on website
+DONE: V04.1 - TA01 - Tamper/Denial: SQL Injection on Organization
+DONE: V04.2 - TA01 - Tamper/Denial: SQl Injection on website
 DONE: V05 - TA01 - Tamper: IDOR Attacks
 
 DONE: C01 - V01 - Proper Access Control - Added IsAdmin Check in AdminService.
-TODO: C02 - V02 - Proper Password, 2FA, Policies
+DONE: C02 - V02 - Proper Password, 2FA, Policies
 DONE: C03 - V03 - Monitoring Alert, Resource limiting
-TODO: C04 - V04 - Input Validation, Prepared Statements/Queries
-TODO: C05 - V04 - Input Validation, Prepared Statements/Queries
+DONE: C04 - V04 - Input Validation, Prepared Statements/Queries
+DONE: C05 - V04 - Input Validation, Prepared Statements/Queries
 DONE: C06 - V05 - Ensure no sensitive data is outputted in body/url
 
 TODO: Lars = Whitebox Testing til nuværende Services
 TODO: Lars = Path Testing - DD Path Graphs - MC/DC vs MCC til nuværende kode
 DONE: Jan = IBoardService
-TODO: Lars = IAdminService + ITeamService
+DONE: Lars = IAdminService + ITeamService
 
 
 - Code left to do
-Mangler: AdminService
-Mangler: Cucumber til BoardService.
-Mangler: MC/DC Tests for AdminService
+DONE: AdminService
+DONE: Cucumber til BoardService.
+DONE: MC/DC Tests for AdminService
 Mangler: Tests for Login
 Mangler: Postman Testing for al API
 Mangler: Test for Public and Private Key
