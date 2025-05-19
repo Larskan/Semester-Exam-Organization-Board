@@ -47,7 +47,6 @@ namespace OrganizationBoard.Service
             {
                 var newTeam = new Team
                 {
-                    TeamID = (int)user.TeamID,
                     TeamName = team.TeamName
                 };
                 _context.TeamTables.Add(newTeam);

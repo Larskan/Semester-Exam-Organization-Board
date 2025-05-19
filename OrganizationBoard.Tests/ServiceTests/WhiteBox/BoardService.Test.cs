@@ -7,7 +7,7 @@ using OrganizationBoard.DTO;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
-    public class BoardServiceTest // Done: 0/58
+    public class BoardServiceTest // Done: 0/24
     {
         private OBDbContext GetInMemoryDbContext(string dbName = "TeamServiceTests")
         {
@@ -31,11 +31,38 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             return context;
         }
 
+        #region Duplicate Tests(Where many methods have the same test)
+        // Why?
+        // At some point it becomes copy paste code, in a true organization, having all tests would be fine, but for our scope, we can focus on the unique tests and show the dupes once.
+
+        // The Team Leader as valid user, set to False = 403
+        // Present at: CreateBoard, UpdateBoard, DeleteBoard, CreateTask, UpdateTask, DeleteTask, AssignTask, ConfirmTaskCompletion - Tests Saved: 7
+
+        // The Team Member as valid user, set to False = 403
+        // Present at: GetBoardTasks, UpdateBoard, DeleteBoard, GetBoard, GetTeamBoards - Tests Saved: 4
+
+        // User as null, return 404
+        // Present at: CreateBoard, AssignTask - Tests Saved: 1 - Doesnt need it as much in dupes.
+
+        // Task as null, return 404
+        // Present at: GetBoardTasks, GetTask, UpdateTask, DeleteTask, AssignTask, MarkTaskAsComplete, ConfirmTaskCompletion - Tests Saved: 6
+
+        // Board as null, return 404
+        // Present at: UpdateBoard, DeleteBoard, GetBoard, GetTeamBoards, CreateTask - Tests Saved: 4
+
+        // Exception in try/catch = 500
+        // Present at: All methods - Tests saved: 12
+
+        #endregion Duplicate Tests(Where many methods have the same test)
+
+        #region Unique Tests(Where each method has a unique test)
+        #endregion Unique Tests(Where each method has a unique test)
+
         #region Tests for CreateBoard
         // 3 Decisions = 4 Tests
         // Test: Leader as valid user, set to False = 403.
         // Test: User as null, return 404
-        // Test: User as valid user, creating new board
+        // Test: Leader as valid user, creating new board
         // Test: Exception in try/catch = 500
         #endregion Tests for CreateBoard
 

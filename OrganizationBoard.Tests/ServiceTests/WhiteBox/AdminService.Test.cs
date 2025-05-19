@@ -7,7 +7,7 @@ using OrganizationBoard.DTO;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
-    public class AdminServiceTest // Done: 0/22
+    public class AdminServiceTest // Done: 0/10
     {
         private OBDbContext GetInMemoryDbContext(string dbName = "TeamServiceTests")
         {
@@ -27,9 +27,33 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
                 new User { UserID = 4, RoleID = 2, Email = "Test4@email.com", Password = "1234", OrganizationID = 1, TeamID = 2 },  // Leader
                 new User { UserID = 5, RoleID = 3, Email = "Test5@email.com", Password = "1234", OrganizationID = 1 } //Member without team
             );
+            context.BoardTables.AddRange(
+                new Board { BoardID = 1, BoardName = "Board 1", TeamID = 1 },
+                new Board { BoardID = 2, BoardName = "Board 2", TeamID = 2 }
+            );
+            context.TaskTables.AddRange(
+                new EFrameWork.Model.Task { TaskID = 1, Title = "Task 1", BoardID = 1, StatusID = 1 },
+                new EFrameWork.Model.Task { TaskID = 2, Title = "Task 2", BoardID = 1, StatusID = 2 },
+                new EFrameWork.Model.Task { TaskID = 3, Title = "Task 3", BoardID = 2, StatusID = 3 }
+            );
             context.SaveChanges();
             return context;
         }
+
+        #region Duplicate Tests(Where many methods have the same test)
+        // Why?
+        // At some point it becomes copy paste code, in a true organization, having all tests would be fine, but for our scope, we can focus on the unique tests and show the dupes once.
+
+        // The Admin as valid user, set to False = 403
+        // Present at: All methods - Tests Saved: 5
+
+        // The Exception in try/catch = 500
+        // Present at: All methods - Tests saved: 5
+
+        // User as null and return 404
+        // Present at: UpdateUser, DeleteUser, GetUser - Tests Saved: 2
+
+        #endregion Duplicate Tests(Where many methods have the same test)
 
         #region Tests for CreateUser
         // 2 Decisions = 3 Tests

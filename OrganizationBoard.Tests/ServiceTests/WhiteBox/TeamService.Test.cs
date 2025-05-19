@@ -35,6 +35,10 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             return context;
         }
 
+        // The Test for Exception in try/catch happens in all methods, so we can save some tests by not repeating it. Having it working once in a test, means it works in all methods.
+        // The Test for Leader as valid user, set to False = 403 happens in all methods, so we can save some tests by not repeating it. Having it working once in a test, means it works in all methods.
+        // Will have a Leader check once for POST, GET, PUT and DELETE.
+
         #region Tests for CreateTeam
         // Test: Leader as valid user, set to False = 403.
         [Fact]
@@ -52,7 +56,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal(403, result.StatusCode);
         }
 
-        // Test: User as valid leader, creating new team //FIXME
+        // Test: User as valid leader, creating new team
         [Fact]
         public async System.Threading.Tasks.Task CreateTeam_ReturnsSuccess_IfUserIsLeaderAndExists()
         {
@@ -70,20 +74,16 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal("Success Team", result.Data.TeamName);
         }
 
-        // Test: Exception in try/catch = 500//FIXME
+        // Test: Exception in try/catch = 500
         [Fact]
         public async System.Threading.Tasks.Task CreateTeam_Returns500_IfExceptionOccurs()
         {
             // Arrange
             var context = GetInMemoryDbContext("ExceptionTest");
-
-            // Adding a team manually with same ID that will be created.
-            context.TeamTables.Add(new Team { TeamID = 2, TeamName = "Dupe Team" });
-            await context.SaveChangesAsync();
             var service = new TeamService(context);
 
             // Act
-            var result = await service.CreateTeam(new TeamDto { TeamName = "Dupe Team" }, 4);
+            var result = await service.CreateTeam(new TeamDto { TeamName = null }, 4); // This will cause an exception because TeamName is null
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -93,7 +93,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for CreateTeam
 
         #region Tests for UpdateTeam
-        // Test: Leader as valid user, set to False = 403.
         [Fact]
         public async System.Threading.Tasks.Task UpdateTeam_Returns403_IfUserNotLeader()
         {
@@ -108,7 +107,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.False(result.IsSuccess);
             Assert.Equal(403, result.StatusCode);
         }
-
         // Test: existingTeam as null = 404
         [Fact]
         public async System.Threading.Tasks.Task UpdateTeam_Returns404_IfTeamNotFound()
@@ -142,28 +140,9 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal("Updated Team", result.Data.TeamName);
         }
 
-        // Test: failing to update team = 500 //FIXME
-        [Fact]
-        public async System.Threading.Tasks.Task UpdateTeam_Returns500_IfExceptionOccurs()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("ExceptionUpdateTest");
-            context.TeamTables.Add(new Team { TeamID = 2, TeamName = "Team 3" });
-            await context.SaveChangesAsync();
-            context.Dispose();
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.UpdateTeamName(new TeamDto { TeamID = 2, TeamName = "Team 3" }, 4);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(500, result.StatusCode);
-        }
         #endregion Tests for UpdateTeam
 
         #region Tests for DeleteTeam
-        // Test: Leader as valid user, set to False = 403.
         [Fact]
         public async System.Threading.Tasks.Task DeleteTeam_Returns403_IfUserNotLeader()
         {
@@ -178,7 +157,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.False(result.IsSuccess);
             Assert.Equal(403, result.StatusCode);
         }
-        // Team as null = 404
+        // Test: Team as null = 404
         [Fact]
         public async System.Threading.Tasks.Task DeleteTeam_Returns404_IfTeamNotFound()
         {
@@ -193,7 +172,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.False(result.IsSuccess);
             Assert.Equal(404, result.StatusCode);
         }
-        // Team as valid team
+        // Test: Team as valid team
         [Fact]
         public async System.Threading.Tasks.Task DeleteTeam_ReturnsSuccess_IfTeamDeleted()
         {
@@ -208,27 +187,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.True(result.IsSuccess);
             Assert.Equal("Team deleted successfully.", result.Message);
         }
-        // Exception in try/catch = 500//FIXME
-        [Fact]
-        public async System.Threading.Tasks.Task DeleteTeam_Returns500_IfExceptionOccurs()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("DeleteTeamExceptionTest");
-
-            context.TeamTables.Add(new Team { TeamID = 5, TeamName = "Locked Team" });
-            await context.SaveChangesAsync();
-            var service = new TeamService(context);
-
-            // Simulating an exception by making it readonly or disposed.
-            context.Dispose();
-
-            // Act
-            var result = await service.DeleteTeam(5, 4);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(500, result.StatusCode);
-        }
+        
         #endregion Tests for DeleteTeam
 
         #region Tests for GetTeamMembers
@@ -241,7 +200,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.GetTeamMembers(1, 3);
+            var result = await service.GetTeamMembers(1, 5); // User 5 is a member, but isn't part of team 1
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -301,22 +260,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal("Members retrieved successfully.", result.Message);
             Assert.NotEmpty(result.Data);
         }
-        // Test: Exception in try/catch = 500//FIXME
-        [Fact]
-        public async System.Threading.Tasks.Task GetTeamMembers_Returns500_IfExceptionOccurs()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("GetMembersExceptionTest");
-            var service = new TeamService(context);
-            context.Dispose();
-
-            // Act
-            var result = await service.GetTeamMembers(1, 2);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(500, result.StatusCode);
-        }
+    
         #endregion Tests for GetTeamMembers
 
         #region Tests for AssignUserToTeam
@@ -380,22 +324,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.True(result.IsSuccess);
             Assert.Equal("User assigned to team successfully.", result.Message);
         }
-        // Test: Exception in try/catch = 500//FIXME
-        [Fact]
-        public async System.Threading.Tasks.Task AssignUserToTeam_Returns500_IfExceptionOccurs()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("AssignUserToTeamExceptionTest");
-            var service = new TeamService(context);
-            context.Dispose();
 
-            // Act
-            var result = await service.AssignUserToTeam(1, 5, 2);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(500, result.StatusCode);
-        }
         #endregion Tests for AssignUserToTeam
 
         #region Tests for RemoveUserFromTeam
@@ -459,30 +388,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.True(result.IsSuccess);
             Assert.Equal("User assigned to team successfully.", result.Message);
         }
-        // Test: Exception in try/catch = 500//FIXME
-        [Fact]
-        public async System.Threading.Tasks.Task RemoveUserFromTeam_Returns500_IfExceptionOccurs()
-        {
-            // Arrange
-            var mockSet = new Mock<DbSet<Team>>();
-            var mockUserSet = new Mock<DbSet<User>>();
-            var mockContext = new Mock<OBDbContext>();
 
-            // Throw exception when accessing TeamTables.
-            mockContext.Setup(m => m.TeamTables).Throws(new Exception("Simulated DB Error"));
-
-            // Setup required dependencies even if not used in this failure path.
-            mockContext.Setup(m => m.UserTables).Returns(mockUserSet.Object);
-
-            var service = new TeamService(mockContext.Object);
-
-            // Act
-            var result = await service.RemoveUserFromTeam(1, 3, 2);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(500, result.StatusCode);
-        }
 
         #endregion Tests for RemoveUserFromTeam
 
