@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using EFramework.Data;
 using EFrameWork.Model;
+using Moq;
 using OrganizationBoard.DTO;
 using OrganizationBoard.Service;
+using Polly;
 using Reqnroll;
 using Xunit;
 
@@ -23,6 +25,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox.Specs
         private OperationResponse<TaskDto> _taskResponse;
         private OperationResponse<TaskReadDto> _taskReadResponse;
         private OperationResponse<bool> _boolResponse;
+        private IAsyncPolicy _policy;
         private User _user;
         private Board _board;
         private EFrameWork.Model.Task _task;
@@ -31,8 +34,19 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox.Specs
         public BoardManagementSteps(ScenarioContext context)
         {
             _context = context;
+            _policy = Policy.NoOpAsync();
             _dbContext = TestDbContextFactory.Create();
-            _service = new BoardService(_dbContext);
+            _service = new BoardService(_dbContext, _policy);
+        }
+
+        [AfterScenario]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
+            // Re-initialize for the next scenario if needed, or rely on the constructor for new instance
+            _dbContext = TestDbContextFactory.Create();
+            _service = new BoardService(_dbContext, _policy);
         }
         #region Given Steps
 
