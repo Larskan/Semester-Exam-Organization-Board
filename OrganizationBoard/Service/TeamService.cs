@@ -126,7 +126,7 @@ namespace OrganizationBoard.Service
         // Test: Members as null= 404
         // Test: Members.Count == 0 = 404
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<List<UserDto>>> GetTeamMembers(int teamId, int requestingUserId)//Ask Jan regarding the header teamID
+        public async Task<OperationResponse<List<UserDto>>> GetTeamMembers(int teamId, int requestingUserId)
         {
             if (!await IsUserTeamLeader(requestingUserId) && !await IsUserTeamMember(requestingUserId, teamId) && !await IsUserAdmin(requestingUserId))
             {
@@ -154,13 +154,14 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 4 Decisions = 5 Tests.
+        // 5 Decisions = 6 Tests.
         // Test: Leader as valid user, set to False = 403.
         // Test: team as null = 404
         // Test: userToAssign as null = 404
+        // Test: userToAssign.TeamID != null = 400
         // Test: team and userToAssign as valid
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<bool>> AssignUserToTeam(int teamId, int userIdToAssign, int requestingAdminId)//Ask Jan regarding the header teamID
+        public async Task<OperationResponse<bool>> AssignUserToTeam(int teamId, int userIdToAssign, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
                 return new OperationResponse<bool>("Access Denied.", false, 403);
@@ -174,6 +175,9 @@ namespace OrganizationBoard.Service
                 var userToAssign = await _context.UserTables.FindAsync(userIdToAssign);
                 if (userToAssign == null)
                     return new OperationResponse<bool>("No user found.", false, 404);
+
+                if (userToAssign.TeamID != null)
+                    return new OperationResponse<bool>("User is already assigned to a team.", false, 400);
 
                 team.Users.Add(userToAssign);
                 await _context.SaveChangesAsync();
@@ -192,7 +196,7 @@ namespace OrganizationBoard.Service
         // Test: userToAssign as null = 404
         // Test: team and userToAssign as valid
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<bool>> RemoveUserFromTeam(int teamId, int userIdToRemove, int requestingAdminId)//Ask Jan regarding the header teamID
+        public async Task<OperationResponse<bool>> RemoveUserFromTeam(int teamId, int userIdToRemove, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
                 return new OperationResponse<bool>("Access Denied.", false, 403);
@@ -209,7 +213,7 @@ namespace OrganizationBoard.Service
 
                 team.Users.Remove(userToAssign);
                 await _context.SaveChangesAsync();
-                return new OperationResponse<bool>(true, "User assigned to team successfully.");
+                return new OperationResponse<bool>(true, "User removed from team successfully.");
 
             }
             catch (Exception ex)
