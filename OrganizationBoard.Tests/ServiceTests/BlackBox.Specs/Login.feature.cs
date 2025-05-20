@@ -137,7 +137,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Successful User Login with Valid Credentials", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 12
+#line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -147,22 +147,22 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 13
+#line 11
     await testRunner.GivenAsync("a user with email \"test@example.com\" and password \"hashedPassword\" exists in the " +
                         "database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 12
     await testRunner.AndAsync("the RSA service will decrypt \"encryptedPassword\" to \"decryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 15
+#line 13
     await testRunner.AndAsync("the BCrypt service will verify \"decryptedPassword\" against \"hashedPassword\" as tr" +
                         "ue", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 14
     await testRunner.WhenAsync("the user attempts to log in with email \"test@example.com\" and password \"encrypted" +
                         "Password\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 17
+#line 15
     await testRunner.ThenAsync("the login should be successful and the user details are returned", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -177,7 +177,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails with Invalid Email", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 19
+#line 17
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -187,14 +187,14 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 20
+#line 18
     await testRunner.GivenAsync("no user with email \"wrong@example.com\" exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 21
+#line 19
     await testRunner.WhenAsync("the user attempts to log in with email \"wrong@example.com\" and password \"anyPassw" +
                         "ord\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 20
     await testRunner.ThenAsync("an UnauthorizedAccessException should be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -209,7 +209,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails with Invalid Password", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 24
+#line 22
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -219,23 +219,23 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 25
+#line 23
     await testRunner.GivenAsync("a user with email \"test@example.com\" and password \"hashedPassword\" exists in the " +
                         "database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 26
+#line 24
     await testRunner.AndAsync("the RSA service will decrypt \"wrongEncryptedPassword\" to \"decryptedWrongPassword\"" +
                         "", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 27
+#line 25
     await testRunner.AndAsync("the BCrypt service will verify \"decryptedWrongPassword\" against \"hashedPassword\" " +
                         "as false", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 28
+#line 26
     await testRunner.WhenAsync("the user attempts to log in with email \"test@example.com\" and password \"wrongEncr" +
                         "yptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 29
+#line 27
     await testRunner.ThenAsync("an UnauthorizedAccessException should be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -250,7 +250,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails due to RSA Decryption Error", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 31
+#line 29
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -260,18 +260,18 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 32
+#line 30
     await testRunner.GivenAsync("a user with email \"test@example.com\" and password \"hashedPassword\" exists in the " +
                         "database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 33
+#line 31
     await testRunner.AndAsync("the RSA service throws an exception when decrypting \"encryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 34
+#line 32
     await testRunner.WhenAsync("the user attempts to log in with email \"test@example.com\" and password \"encrypted" +
                         "Password\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 35
+#line 33
     await testRunner.ThenAsync("an ApplicationException with message \"Something went wrong while logging in.\" sho" +
                         "uld be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -287,7 +287,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails due to BCrypt Verification Error", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 37
+#line 35
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -297,22 +297,22 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 38
+#line 36
     await testRunner.GivenAsync("a user with email \"test@example.com\" and password \"hashedPassword\" exists in the " +
                         "database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 39
+#line 37
     await testRunner.AndAsync("the RSA service will decrypt \"encryptedPassword\" to \"decryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 40
+#line 38
     await testRunner.AndAsync("the BCrypt service throws an exception when verifying \"decryptedPassword\" against" +
                         " \"hashedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 41
+#line 39
     await testRunner.WhenAsync("the user attempts to log in with email \"test@example.com\" and password \"encrypted" +
                         "Password\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 42
+#line 40
     await testRunner.ThenAsync("an ApplicationException with message \"Something went wrong while logging in.\" sho" +
                         "uld be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -328,7 +328,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails with Email at Minimum Invalid Length (BVT)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 46
+#line 42
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -338,17 +338,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 47
+#line 43
     await testRunner.GivenAsync("a user with email \"valid@example.com\" and password \"hashedPassword\" exists in the" +
                         " database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 48
+#line 44
     await testRunner.AndAsync("the RSA service will decrypt \"encryptedPassword\" to \"decryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 49
+#line 45
     await testRunner.WhenAsync("the user attempts to log in with email \"a@a.c\" and password \"encryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 50
+#line 46
     await testRunner.ThenAsync("an UnauthorizedAccessException with message \"Attempted to perform an unauthorized" +
                         " operation.\" should be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -364,7 +364,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails with Email Containing Invalid Format (ECT)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 52
+#line 48
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -374,18 +374,18 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 53
+#line 49
     await testRunner.GivenAsync("a user with email \"test@example.com\" and password \"hashedPassword\" exists in the " +
                         "database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 54
+#line 50
     await testRunner.AndAsync("the RSA service will decrypt \"encryptedPassword\" to \"decryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 55
+#line 51
     await testRunner.WhenAsync("the user attempts to log in with email \"invalid-email\" and password \"encryptedPas" +
                         "sword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 56
+#line 52
     await testRunner.ThenAsync("a ValidationException with message \"Invalid email or password\" should be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -400,7 +400,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails with Missing Email (Required attribute)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 58
+#line 54
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -410,17 +410,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 59
+#line 55
     await testRunner.GivenAsync("a user with email \"test@example.com\" and password \"hashedPassword\" exists in the " +
                         "database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 60
+#line 56
     await testRunner.AndAsync("the RSA service will decrypt \"encryptedPassword\" to \"decryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 61
+#line 57
     await testRunner.WhenAsync("the user attempts to log in with email \"\" and password \"encryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 62
+#line 58
     await testRunner.ThenAsync("a ValidationException with message \"The Email field is required.\" should be throw" +
                         "n", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -436,7 +436,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Login Fails with Missing Password (Required attribute)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 64
+#line 60
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -446,17 +446,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 65
+#line 61
     await testRunner.GivenAsync("a user with email \"test@example.com\" and password \"hashedPassword\" exists in the " +
                         "database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 66
+#line 62
     await testRunner.AndAsync("the RSA service will decrypt \"encryptedPassword\" to \"decryptedPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 67
+#line 63
     await testRunner.WhenAsync("the user attempts to log in with email \"test@example.com\" and password \"\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 68
+#line 64
     await testRunner.ThenAsync("a ValidationException with message \"Invalid email or password\" should be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -471,7 +471,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Successful Account and Organization Creation", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 72
+#line 66
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -481,20 +481,20 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 73
+#line 67
     await testRunner.GivenAsync("the \"Admin\" role exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 74
+#line 68
     await testRunner.AndAsync("the BCrypt service will hash \"newPassword123!\" to \"hashedNewPassword123!\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 75
+#line 69
     await testRunner.WhenAsync("a new account is created with email \"newuser@example.com\", password \"newPassword1" +
                         "23!\", and organization \"NewOrg\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 76
+#line 70
     await testRunner.ThenAsync("a new organization \"NewOrg\" should be saved to the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 77
+#line 71
     await testRunner.AndAsync("a new user \"newuser@example.com\" with \"hashedNewPassword123!\" and \"Admin\" role fo" +
                         "r \"NewOrg\" should be saved to the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
@@ -510,7 +510,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Account and Organization Creation Fails due to Database Error during User Save", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 79
+#line 73
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -520,23 +520,23 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 80
+#line 74
     await testRunner.GivenAsync("the \"Admin\" role exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 81
+#line 75
     await testRunner.AndAsync("the BCrypt service will hash \"P@ssw0rd1\" to \"hashedNewPassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 82
+#line 76
     await testRunner.AndAsync("the organization \"NewOrg\" is successfully saved", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 83
+#line 77
     await testRunner.AndAsync("a database error occurs when saving the user \"newuser@example.com\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 84
+#line 78
     await testRunner.WhenAsync("a new account is created with email \"newuser@example.com\", password \"P@ssw0rd1\", " +
                         "and organization \"NewOrg\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 85
+#line 79
     await testRunner.ThenAsync("an ApplicationException with message \"Something went wrong while logging in.\" sho" +
                         "uld be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -552,7 +552,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Account Creation Fails with Missing Email (Required attribute)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 89
+#line 81
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -562,17 +562,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 90
+#line 82
     await testRunner.GivenAsync("the \"Admin\" role exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 91
+#line 83
     await testRunner.AndAsync("the BCrypt service will hash \"password123!\" to \"hashedPassword123!\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 92
+#line 84
     await testRunner.WhenAsync("a new account is created with email \"\", password \"password123!\", and organization" +
                         " \"ValidOrg\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 93
+#line 85
     await testRunner.ThenAsync("a ValidationException with message \"The Email field is required.\" should be throw" +
                         "n", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -588,7 +588,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Account Creation Fails with Email Containing Invalid Format (ECT)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 95
+#line 87
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -598,17 +598,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 96
+#line 88
     await testRunner.GivenAsync("the \"Admin\" role exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 97
+#line 89
     await testRunner.AndAsync("the BCrypt service will hash \"password123!\" to \"hashedPassword123!\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 98
+#line 90
     await testRunner.WhenAsync("a new account is created with email \"invalid-email-format\", password \"password123" +
                         "!\", and organization \"ValidOrg\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 99
+#line 91
     await testRunner.ThenAsync("a ValidationException with message \"Invalid email format.\" should be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -623,7 +623,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Account Creation Fails with Password Lacking Required Complexity (ECT)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 101
+#line 93
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -633,17 +633,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 102
+#line 94
     await testRunner.GivenAsync("the \"Admin\" role exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 103
+#line 95
     await testRunner.AndAsync("the BCrypt service will hash \"simplepassword123\" to \"hashedSimplePassword\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 104
+#line 96
     await testRunner.WhenAsync("a new account is created with email \"newuser@example.com\", password \"simplepasswo" +
                         "rd123\", and organization \"ValidOrg\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 105
+#line 97
     await testRunner.ThenAsync("a ValidationException with message \"Password must be at least 8 characters long, " +
                         "contain at least one uppercase letter, one number, and one special character.\" s" +
                         "hould be thrown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
@@ -660,7 +660,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Account Creation Fails with Missing Password (Required attribute)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 107
+#line 99
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -670,17 +670,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 108
+#line 100
     await testRunner.GivenAsync("the \"Admin\" role exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 109
+#line 101
     await testRunner.AndAsync("the BCrypt service will hash \"\" to \"\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 110
+#line 102
     await testRunner.WhenAsync("a new account is created with email \"newuser@example.com\", password \"\", and organ" +
                         "ization \"ValidOrg\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 111
+#line 103
     await testRunner.ThenAsync("a ValidationException with message \"The Password field is required.\" should be th" +
                         "rown", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
@@ -696,7 +696,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Account Creation Fails with Missing Organization Name (Required attribute)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 113
+#line 105
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -706,17 +706,17 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox_Specs
             else
             {
                 await this.ScenarioStartAsync();
-#line 114
+#line 106
     await testRunner.GivenAsync("the \"Admin\" role exists in the database", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 115
+#line 107
     await testRunner.AndAsync("the BCrypt service will hash \"password123!\" to \"hashedPassword123!\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 116
+#line 108
     await testRunner.WhenAsync("a new account is created with email \"newuser@example.com\", password \"Password123!" +
                         "\", and organization \"\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 117
+#line 109
     await testRunner.ThenAsync("a ValidationException with message \"Organization name is required.\" should be thr" +
                         "own", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden

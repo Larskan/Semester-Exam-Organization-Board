@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Reqnroll;
 using System.Threading;
-using System.ComponentModel.DataAnnotations; // Added for ValidationException
-using System.Text.RegularExpressions; // Added for regex pattern in Organization Name validation example
+using System.ComponentModel.DataAnnotations;
+
 
 namespace OrganizationBoard.Tests.Steps
 {
@@ -58,8 +58,6 @@ namespace OrganizationBoard.Tests.Steps
             );
         }
 
-        // --- Existing steps (User, RSA, BCrypt) remain mostly the same ---
-
         [Given(@"a user with email ""(.*)"" and password ""(.*)"" exists in the database")]
         public async System.Threading.Tasks.Task GivenAUserWithEmailAndPasswordExistsInTheDatabase(string email, string password)
         {
@@ -99,7 +97,6 @@ namespace OrganizationBoard.Tests.Steps
             try
             {
                 _caughtException = null;
-                // Manually validate DTO using DataAnnotations if not implicitly handled by API pipeline
                 Validator.ValidateObject(_loginDto, new ValidationContext(_loginDto), validateAllProperties: true);
                 _expectedUser = await _loginService.UserCheck(_loginDto);
             }
@@ -152,8 +149,6 @@ namespace OrganizationBoard.Tests.Steps
             Assert.Equal(expectedMessage, appEx.Message);
         }
 
-        // --- Existing steps (DB error scenarios) ---
-
         [Given(@"a database error occurs when saving the organization ""(.*)""")]
         public async System.Threading.Tasks.Task GivenADatabaseErrorOccursWhenSavingTheOrganization(string orgName)
         {
@@ -179,26 +174,19 @@ namespace OrganizationBoard.Tests.Steps
         public async System.Threading.Tasks.Task GivenADatabaseErrorOccursWhenSavingTheUser(string email)
         {
             await GivenTheRoleExistsInTheDatabase("Admin");
-            // You are saving a temporary organization here using the _db instance.
+            // We are saving a temporary organization here using the _db instance.
             await GivenTheOrganizationIsSuccessfullySaved($"TempOrgForUserError_{Guid.NewGuid()}");
 
             var dbMockForError = new Mock<OBDbContext>();
-            // ...
-            // You are setting up mocks for dbMockForError, but then assigning it to _loginService.
-            // However, the _db.OrganizationTables and _db.UserTables will use the *original* _db instance, not the mock.
-            // This could cause issues if the mocked properties (RoleTables, OrganizationTables) aren't also mocked properly.
             dbMockForError.Setup(db => db.RoleTables).Returns(_db.RoleTables); // This returns the *real* tables from _db
             dbMockForError.Setup(db => db.OrganizationTables).Returns(_db.OrganizationTables); // This returns the *real* tables from _db
 
-            // ... throws for AddAsync and SaveChangesAsync on the *mocked* dbMockForError.
             _loginService = new LoginService(
-                dbMockForError.Object, // LoginService now uses the MOCKED DB context
+                dbMockForError.Object,
                 _bCryptServiceMock.Object,
                 _rsaServiceMock.Object
             );
         }
-
-        // --- Common Setup Steps ---
 
         [Given(@"the ""(.*)"" role exists in the database")]
         public async System.Threading.Tasks.Task GivenTheRoleExistsInTheDatabase(string roleName)
@@ -226,7 +214,6 @@ namespace OrganizationBoard.Tests.Steps
             try
             {
                 _caughtException = null;
-                // Manually validate DTO using DataAnnotations if not implicitly handled by API pipeline
                 Validator.ValidateObject(_accountAndOrgDto, new ValidationContext(_accountAndOrgDto), validateAllProperties: true);
                 await _loginService.CreateAccountAndOrg(_accountAndOrgDto);
             }
@@ -248,8 +235,6 @@ namespace OrganizationBoard.Tests.Steps
                 _db.Entry(org).State = EntityState.Detached;
             }
         }
-
-        // --- Other steps remain unchanged ---
 
         [Given(@"the BCrypt service will hash ""(.*)"" to ""(.*)""")]
         public void GivenTheBCryptServiceWillHashTo(string rawPassword, string hashedPassword)
@@ -279,12 +264,6 @@ namespace OrganizationBoard.Tests.Steps
             Assert.NotNull(user.Organization);
             Assert.Equal(orgName, user.Organization.OrganizationName);
         }
-
-        // *******************************************************************
-        //                   NEW BVT/ECT SCENARIOS
-        // *******************************************************************
-
-        // --- Login Related BVT/ECT ---
 
         // These 'Given' steps are purely for documentation in the feature file.
         // The actual validation is handled by DTO attributes.

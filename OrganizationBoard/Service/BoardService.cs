@@ -194,7 +194,7 @@ namespace OrganizationBoard.Service
                     if (!await IsUserTeamMember(requestingUserId, boardId))
                         return new OperationResponse<bool>("Access Denied", false, 403);
 
-                    // Check if the board has any tasks
+                    // Checks if the board has any tasks
                     if (_context.TaskTables!.Any(t => t.BoardID == boardId))
                         _context.TaskTables!.RemoveRange(_context.TaskTables.Where(t => t.BoardID == boardId));
 
@@ -297,7 +297,7 @@ namespace OrganizationBoard.Service
                     var board = await _context.BoardTables!.FirstOrDefaultAsync(b => b.BoardID == boardId);
                     if (board == null)
                         return new OperationResponse<TaskDto>("Board not found", false, 404);
-                    // Only Team Leaders can create tasks
+
                     if (!await IsUserTeamLeader(requestingUserId))
                         return new OperationResponse<TaskDto>("Access Denied", false, 403);
 
@@ -368,7 +368,6 @@ namespace OrganizationBoard.Service
             {
                 return await _retryPolicy.ExecuteAsync(async () =>
                 {
-                    // Only Team Leaders can update tasks
                     if (!await IsUserTeamLeader(requestingUserId))
                         return new OperationResponse<TaskReadDto>("Access Denied", false, 403);
 
@@ -414,7 +413,6 @@ namespace OrganizationBoard.Service
             {
                 return await _retryPolicy.ExecuteAsync(async () =>
                 {
-                    // Only Team Leaders can delete tasks
                     if (!await IsUserTeamLeader(requestingUserId))
                         return new OperationResponse<bool>("Access Denied", false, 403);
 
@@ -493,7 +491,6 @@ namespace OrganizationBoard.Service
                         return new OperationResponse<bool>("Task not found", false, 404);
                     }
 
-                    // Only Team Members assigned to the task can mark it as complete
                     if (!await IsUserInTask(requestingUserId, taskId))
                     {
                         return new OperationResponse<bool>("Access Denied", false, 403);

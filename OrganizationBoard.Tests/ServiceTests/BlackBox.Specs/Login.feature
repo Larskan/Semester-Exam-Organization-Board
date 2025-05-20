@@ -7,8 +7,6 @@ Feature: User Login and Account Creation
   I want to be able to log in and create new accounts
   So that I can access and manage my organization's boards and tasks
 
-  # --- Existing Login Scenarios ---
-
   Scenario: Successful User Login with Valid Credentials
     Given a user with email "test@example.com" and password "hashedPassword" exists in the database
     And the RSA service will decrypt "encryptedPassword" to "decryptedPassword"
@@ -41,8 +39,6 @@ Feature: User Login and Account Creation
     When the user attempts to log in with email "test@example.com" and password "encryptedPassword"
     Then an ApplicationException with message "Something went wrong while logging in." should be thrown
 
-  # --- New Login Scenarios (BVT/ECT) ---
-
   Scenario: Login Fails with Email at Minimum Invalid Length (BVT)
     Given a user with email "valid@example.com" and password "hashedPassword" exists in the database
     And the RSA service will decrypt "encryptedPassword" to "decryptedPassword"
@@ -67,8 +63,6 @@ Feature: User Login and Account Creation
     When the user attempts to log in with email "test@example.com" and password ""
     Then a ValidationException with message "Invalid email or password" should be thrown
 
-  # --- Existing Account Creation Scenarios ---
-
   Scenario: Successful Account and Organization Creation
     Given the "Admin" role exists in the database
     And the BCrypt service will hash "newPassword123!" to "hashedNewPassword123!"
@@ -83,8 +77,6 @@ Feature: User Login and Account Creation
     And a database error occurs when saving the user "newuser@example.com"
     When a new account is created with email "newuser@example.com", password "P@ssw0rd1", and organization "NewOrg"
     Then an ApplicationException with message "Something went wrong while logging in." should be thrown
-
-  # --- New Account Creation Scenarios (BVT/ECT) ---
 
   Scenario: Account Creation Fails with Missing Email (Required attribute)
     Given the "Admin" role exists in the database

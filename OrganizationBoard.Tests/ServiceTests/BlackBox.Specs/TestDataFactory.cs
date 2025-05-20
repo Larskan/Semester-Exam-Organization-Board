@@ -10,7 +10,7 @@ public static class TestDataFactory
 {
     private static int _nextUserId = 10; // Start from 10, increment for each call
     private static int _nextOrganizationId = 1;
-    private static int _nextRoleId = 1; // Assuming roles might also need unique IDs if dynamically created
+    private static int _nextRoleId = 1;
 
     public static User CreateUser(int id = 0, int teamId = 1, string role = "User", string email = null, string password = null)
     {
@@ -30,12 +30,12 @@ public static class TestDataFactory
 
     public static Role CreateRole(string roleName, int id = 0)
     {
-        // If these roles are truly fixed in your application, hardcode their IDs
         if (roleName == "Admin") return new Role { RoleID = 1, RoleName = "Admin" };
         if (roleName == "Team Leader") return new Role { RoleID = 2, RoleName = "Team Leader" };
+        if (roleName == "Team Member") return new Role { RoleID = 3, RoleName = "Team Member" };
 
-        // For any other roles, use the auto-incrementing ID
         int roleId = id == 0 ? Interlocked.Increment(ref _nextRoleId) : id;
+
         return new Role
         {
             RoleID = roleId,

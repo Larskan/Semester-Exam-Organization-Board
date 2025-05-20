@@ -70,7 +70,6 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox.Specs
         public void GivenATaskWithIdExistsOnBoardNotAssignedToUser(int taskId, int boardId, int userId)
         {
             var task = TestDataFactory.CreateTask(boardId: boardId, title: $"Task {taskId}", taskId: taskId);
-            // No UserAssignments are added, ensuring it's not assigned to any user.
             _dbContext.TaskTables.Add(task);
             _dbContext.SaveChanges();
         }
@@ -137,7 +136,7 @@ namespace OrganizationBoard.Tests.ServiceTests.BlackBox.Specs
             }
             else
             {
-                // Create a DTO with the provided ID and name, even if the board doesn't exist
+                // This will Create a DTO with the provided ID and name, even if the board doesn't exist
                 var dto = new BoardReadDto { BoardID = boardId, BoardName = newName, TeamID = 1 }; // Assuming a default TeamID for the DTO
                 _boardReadResponse = await _service.UpdateBoard(dto, _user.UserID);
             }
