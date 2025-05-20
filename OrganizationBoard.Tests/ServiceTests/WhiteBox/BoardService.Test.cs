@@ -16,16 +16,29 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 
             var context = new OBDbContext(options);
             // The Seed Data from EFrameWork.Data/OBDbContext is not automatically reached, so we have to add some data manually.
+            context.OrganizationTables.AddRange(
+                new Organization { OrganizationID = 1, OrganizationName = "OrgOne" },
+                new Organization { OrganizationID = 2, OrganizationName = "OrgTwo" }
+            );
             context.TeamTables.AddRange(
                 new Team { TeamID = 1, TeamName = "Team 1" },
                 new Team { TeamID = 2, TeamName = "Team 2" }
             );
             context.UserTables.AddRange(
-                new User { UserID = 1, RoleID = 1, Email = "Test1@email.com", Password = "1234", OrganizationID = 1 }, //Admin
-                new User { UserID = 2, RoleID = 2, Email = "Test2@email.com", Password = "1234", OrganizationID = 1, TeamID = 1 }, // Leader
-                new User { UserID = 3, RoleID = 3, Email = "Test3@email.com", Password = "1234", OrganizationID = 1, TeamID = 1 }, // Member
-                new User { UserID = 4, RoleID = 2, Email = "Test4@email.com", Password = "1234", OrganizationID = 1, TeamID = 2 },  // Leader
-                new User { UserID = 5, RoleID = 3, Email = "Test5@email.com", Password = "1234", OrganizationID = 1 } //Member without team
+                new User { UserID = 1, RoleID = 1, Email = "Test1@email.com", Password = "Lars123!", OrganizationID = 1 }, //Admin
+                new User { UserID = 2, RoleID = 2, Email = "Test2@email.com", Password = "Lars123!", OrganizationID = 1, TeamID = 1 }, // Leader
+                new User { UserID = 3, RoleID = 3, Email = "Test3@email.com", Password = "Lars123!", OrganizationID = 1, TeamID = 1 }, // Member
+                new User { UserID = 4, RoleID = 2, Email = "Test4@email.com", Password = "Lars123!", OrganizationID = 1, TeamID = 2 },  // Leader
+                new User { UserID = 5, RoleID = 3, Email = "Test5@email.com", Password = "Lars123!", OrganizationID = 1 } //Member without team
+            );
+            context.BoardTables.AddRange(
+                new Board { BoardID = 1, BoardName = "Board 1", TeamID = 1 },
+                new Board { BoardID = 2, BoardName = "Board 2", TeamID = 2 }
+            );
+            context.TaskTables.AddRange(
+                new EFrameWork.Model.Task { TaskID = 1, Title = "Task 1", BoardID = 1, StatusID = 1 },
+                new EFrameWork.Model.Task { TaskID = 2, Title = "Task 2", BoardID = 1, StatusID = 2 },
+                new EFrameWork.Model.Task { TaskID = 3, Title = "Task 3", BoardID = 2, StatusID = 3 }
             );
             context.SaveChanges();
             return context;

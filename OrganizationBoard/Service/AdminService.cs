@@ -20,26 +20,21 @@ namespace OrganizationBoard.Service
             _bCryptService = bCryptService;
         }
 
-        // V01 - TA01 - Elevation: Member has access to Lead/Admin perms
         private async Task<bool> IsUserAdmin(int userId){
             var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
             return user != null && user.RoleID == 1;
         }
 
         #region User Management
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: Email doesnt exist = 400
-        // Test: Admin as valid user and email exists, creating new user
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<UserCreateDto>> CreateUser(UserCreateDto user, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
                 return new OperationResponse<UserCreateDto>("Access Denied", false, 403);
 
-            var hashedPassword = _bCryptService.HashPassword(user.Password);
+            
             try
             {
+                var hashedPassword = _bCryptService.HashPassword(user.Password);
                 bool emailExists = await _context.UserTables!.AnyAsync(u => u.Email == user.Email);
 
                 if (emailExists)
@@ -64,14 +59,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-
-        // 5 Decisions = 6 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: existingUser as null = 404
-        // Test: Email doesnt exist = 400
-        // Test: New email matches existing email = 400
-        // Test: Successsfully updating user
-        // Test: failing to update user = 500
         public async Task<OperationResponse<UserCreateDto>> UpdateUser(UserCreateDto user, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
@@ -88,7 +75,8 @@ namespace OrganizationBoard.Service
                 if (existingUser == null)
                     return new OperationResponse<UserCreateDto>("User not found", false, 404);
 
-                if (emailExists && existingUser.Email != user.Email)
+                // Cheks if any user has the email already && current email user has isnt different than the one you are trying to set it to
+                if (emailExists && existingUser.Email == user.Email)
                     return new OperationResponse<UserCreateDto>("Email already exists", false, 400);
 
                 existingUser.Email = user.Email;
@@ -107,11 +95,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: existingUser as null = 404
-        // Test: existingUser as valid user, deleting user. 
-        // Test: failing to update user = 500
         public async Task<OperationResponse<bool>> DeleteUser(int userId, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
@@ -134,11 +117,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: Admin as valid user, getting user
-        // Test: user as null = 404
-        // Test: failing to get user = 500
         public async Task<OperationResponse<UserDto>> GetUser(int userId, int requestingAdminId)
         {
             try
@@ -167,10 +145,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 2 Decisions = 3 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: Admin as valid user, getting all users
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<List<UserDto>>> GetAllUsers(int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
@@ -197,11 +171,6 @@ namespace OrganizationBoard.Service
         #endregion User Management
 
         #region Organization Management
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: existingOrg as null = 404
-        // Test: existingOrg as valid org
-        // Test: failing to update org = 500
         public async Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))
@@ -209,7 +178,6 @@ namespace OrganizationBoard.Service
 
             try
             {
-
                 var existingOrg = await _context.OrganizationTables!.FindAsync(organization.OrganizationID);
                 if (existingOrg == null)
                     return new OperationResponse<Organization>("Organization not found", false, 404);
