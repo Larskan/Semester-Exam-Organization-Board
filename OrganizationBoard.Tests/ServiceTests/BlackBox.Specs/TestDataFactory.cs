@@ -3,28 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EFrameWork.Model;
+using Model;
 using OrganizationBoard.DTO;
 
 public static class TestDataFactory
 {
-    public static User CreateUser(int id, int teamId, string role)
+    private static int _nextUserId = 10; // Start from 10, increment for each call
+    private static int _nextOrganizationId = 1;
+    private static int _nextRoleId = 1; // Assuming roles might also need unique IDs if dynamically created
+
+    public static User CreateUser(int id = 0, int teamId = 1, string role = "User", string email = null, string password = null)
     {
-        int roleId = role == "Team Leader" ? 2 : 1;
+        // If ID is not provided (or is 0), generate a unique one
+        int userId = id == 0 ? Interlocked.Increment(ref _nextUserId) : id;
+        int roleId = role == "Admin" ? 1 : (role == "Team Leader" ? 2 : 3); // Keep fixed role IDs if they are static in your app
+
         return new User
         {
-            UserID = id,
-            RoleID = roleId,
+            UserID = userId,
+            RoleID = roleId, // Assign role ID from role
             TeamID = teamId,
-            Email = $"user{id}@example.com",
-            Password = "Password123!"
+            Email = email ?? $"user{userId}@example.com",
+            Password = password ?? "hashedPassword" // Assuming passwords are hashed when stored
         };
     }
 
-    public static Board CreateBoard(int id, string name, int teamId)
+    public static Role CreateRole(string roleName, int id = 0)
+    {
+        // If these roles are truly fixed in your application, hardcode their IDs
+        if (roleName == "Admin") return new Role { RoleID = 1, RoleName = "Admin" };
+        if (roleName == "Team Leader") return new Role { RoleID = 2, RoleName = "Team Leader" };
+
+        // For any other roles, use the auto-incrementing ID
+        int roleId = id == 0 ? Interlocked.Increment(ref _nextRoleId) : id;
+        return new Role
+        {
+            RoleID = roleId,
+            RoleName = roleName
+        };
+    }
+
+    public static Organization CreateOrganization(string orgName, int orgId = 0)
+    {
+        int organizationId = orgId == 0 ? Interlocked.Increment(ref _nextOrganizationId) : orgId;
+        return new Organization
+        {
+            OrganizationID = organizationId,
+            OrganizationName = orgName
+        };
+    }
+
+    public static Board CreateBoard(int id = 0, string name = "Test Board", int teamId = 1)
     {
         return new Board
         {
-            BoardID = id,
+            BoardID = id, // If ID is 0, EF Core In-Memory will auto-generate.
             BoardName = name,
             TeamID = teamId
         };
@@ -34,7 +67,7 @@ public static class TestDataFactory
     {
         return new EFrameWork.Model.Task
         {
-            TaskID = taskId ?? 0, // Allow setting TaskID explicitly
+            TaskID = taskId ?? 0, // Allow setting TaskID explicitly, otherwise EF Core in-memory will generate
             BoardID = boardId,
             Title = title,
             Description = desc,
@@ -61,6 +94,25 @@ public static class TestDataFactory
             Estimation = estimation,
             NumUser = numUser,
             BoardID = boardId
+        };
+    }
+
+    public static LoginDto CreateLoginDto(string email, string password)
+    {
+        return new LoginDto
+        {
+            Email = email,
+            Password = password
+        };
+    }
+
+    public static AccountAndOrgDto CreateAccountAndOrgDto(string email, string password, string orgName)
+    {
+        return new AccountAndOrgDto
+        {
+            Email = email,
+            Password = password,
+            OrgName = orgName
         };
     }
 }
