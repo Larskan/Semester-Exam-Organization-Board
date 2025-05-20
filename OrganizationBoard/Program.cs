@@ -92,10 +92,10 @@ builder.Services.AddRateLimiter(options =>
             factory: key => new FixedWindowRateLimiter(
                 new FixedWindowRateLimiterOptions
                 {
-                    PermitLimit = 10, // Max 10 requests
+                    PermitLimit = 200, // Max 10 requests
                     Window = TimeSpan.FromMinutes(1),
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                    QueueLimit = 2
+                    QueueLimit = 0
                 })));
 });
 

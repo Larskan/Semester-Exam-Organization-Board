@@ -123,7 +123,7 @@
 			"response": []
 		},
 		{
-			"name": "3. Login, Email And Password Valid",
+			"name": "ECT-1-4. Login, Email And Password Valid",
 			"event": [
 				{
 					"listen": "test",
@@ -170,7 +170,7 @@
 			"response": []
 		},
 		{
-			"name": "3. Login, Email Invalid",
+			"name": "ECT-2. Login, Email Invalid",
 			"event": [
 				{
 					"listen": "test",
@@ -178,6 +178,15 @@
 						"exec": [
 							"pm.test(\"❌ Invalid email format caught\", function () {",
 							"    pm.response.to.have.status(400);",
+							"    const errors = pm.response.json().errors;",
+							"",
+							"    for (let field in errors) {",
+							"        const message = errors[field][0];",
+							"",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {",
+							"            pm.expect(message).to.be.a('string');",
+							"        });",
+							"    }",
 							"});"
 						],
 						"type": "text/javascript",
@@ -214,13 +223,13 @@
 			"response": []
 		},
 		{
-			"name": "3. Login, Password Invalid",
+			"name": "ECT-5. Login, Password Invalid",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"❌ Invalid email format caught\", function () {",
+							"pm.test(\"❌ Invalid password format caught\", function () {",
 							"    pm.response.to.have.status(500);",
 							"});"
 						],
@@ -268,7 +277,133 @@
 			"response": []
 		},
 		{
-			"name": "4. CreateAccountAndOrg, Email and password Valid",
+			"name": "ECT-3. Login, Email Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"❌ invalid username or password\", function () {",
+							"    pm.response.to.have.status(400);",
+							"    const errors = pm.response.json().errors;",
+							"",
+							"    for (let field in errors) {",
+							"        const message = errors[field][0];",
+							"",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {",
+							"            pm.expect(message).to.be.a('string');",
+							"        });",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"\",\n  \"password\": {{encryptedPassword}}\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/Login/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"Login",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ECT-3. Login, password Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"❌ invalid username or password\", function () {",
+							"    pm.response.to.have.status(400);",
+							"    const errors = pm.response.json().errors;",
+							"",
+							"    for (let field in errors) {",
+							"        const message = errors[field][0];",
+							"",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {",
+							"            pm.expect(message).to.be.a('string');",
+							"        });",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"Mail1@example.com\",\n  \"password\": \"\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/Login/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"Login",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ECT-1-4-7. CreateAccountAndOrg, Email and password Valid",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -332,7 +467,7 @@
 			"response": []
 		},
 		{
-			"name": "4. CreateAccountAndOrg, Password invalid format",
+			"name": "ECT-2. CreateAccountAndOrg, Emaile Format Invalid",
 			"event": [
 				{
 					"listen": "test",
@@ -340,7 +475,36 @@
 						"exec": [
 							"pm.test(\"❌ Invalid email format caught\", function () {\r",
 							"    pm.response.to.have.status(400);\r",
+							"    const errors = pm.response.json().errors;\r",
+							"\r",
+							"    for (let field in errors) {\r",
+							"        const message = errors[field][0];\r",
+							"\r",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {\r",
+							"            pm.expect(message).to.be.a('string');\r",
+							"        });\r",
+							"    }\r",
 							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function generateRandomString(length = 8) {\r",
+							"    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');\r",
+							"}\r",
+							"\r",
+							"const randomString = generateRandomString();\r",
+							"const email = `test_${randomString}@example.com`;\r",
+							"const org = `Org_${generateRandomString(10)}`;\r",
+							"\r",
+							"pm.collectionVariables.set(\"randomEmail\", email);\r",
+							"pm.collectionVariables.set(\"randomOrg\", org);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -352,7 +516,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"email\": \"test@example.com\",\r\n  \"password\": \"abc\",\r\n  \"orgName\": \"TestOrg\"\r\n}",
+					"raw": "{\r\n  \"email\": \"12345\",\r\n  \"password\": \"Abcdef1!\",\r\n  \"orgName\": \"{{randomOrg}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -376,14 +540,335 @@
 			"response": []
 		},
 		{
-			"name": "4. CreateAccountAndOrg, Emaile Format Invalid",
+			"name": "ECT-5. CreateAccountAndOrg, Password invalid format",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"❌ Invalid email format caught\", function () {\r",
+							"pm.test(\"❌ Invalid password format caught\", function () {\r",
 							"    pm.response.to.have.status(400);\r",
+							"    const errors = pm.response.json().errors;\r",
+							"\r",
+							"    for (let field in errors) {\r",
+							"        const message = errors[field][0];\r",
+							"\r",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {\r",
+							"            pm.expect(message).to.be.a('string');\r",
+							"        });\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function generateRandomString(length = 8) {\r",
+							"    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');\r",
+							"}\r",
+							"\r",
+							"const randomString = generateRandomString();\r",
+							"const email = `test_${randomString}@example.com`;\r",
+							"const org = `Org_${generateRandomString(10)}`;\r",
+							"\r",
+							"pm.collectionVariables.set(\"randomEmail\", email);\r",
+							"pm.collectionVariables.set(\"randomOrg\", org);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{randomEmail}}\",\r\n  \"password\": \"abc\",\r\n  \"orgName\": \"{{randomOrg}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/Login/AccountAndOrgCreation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"Login",
+						"AccountAndOrgCreation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ECT-3. CreateAccountAndOrg, Email Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"❌ empty email format caught\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    const errors = pm.response.json().errors;\r",
+							"\r",
+							"    for (let field in errors) {\r",
+							"        const message = errors[field][0];\r",
+							"\r",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {\r",
+							"            pm.expect(message).to.be.a('string');\r",
+							"        });\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function generateRandomString(length = 8) {\r",
+							"    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');\r",
+							"}\r",
+							"\r",
+							"const randomString = generateRandomString();\r",
+							"const email = `test_${randomString}@example.com`;\r",
+							"const org = `Org_${generateRandomString(10)}`;\r",
+							"\r",
+							"pm.collectionVariables.set(\"randomEmail\", email);\r",
+							"pm.collectionVariables.set(\"randomOrg\", org);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"\",\r\n  \"password\": \"Abcdef1!\",\r\n  \"orgName\": \"{{randomOrg}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/Login/AccountAndOrgCreation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"Login",
+						"AccountAndOrgCreation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ECT-6. CreateAccountAndOrg, Password Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"❌ empty password format caught\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    const errors = pm.response.json().errors;\r",
+							"\r",
+							"    for (let field in errors) {\r",
+							"        const message = errors[field][0];\r",
+							"\r",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {\r",
+							"            pm.expect(message).to.be.a('string');\r",
+							"        });\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function generateRandomString(length = 8) {\r",
+							"    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');\r",
+							"}\r",
+							"\r",
+							"const randomString = generateRandomString();\r",
+							"const email = `test_${randomString}@example.com`;\r",
+							"const org = `Org_${generateRandomString(10)}`;\r",
+							"\r",
+							"pm.collectionVariables.set(\"randomEmail\", email);\r",
+							"pm.collectionVariables.set(\"randomOrg\", org);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{randomEmail}}\",\r\n  \"password\": \"\",\r\n  \"orgName\": \"{{randomOrg}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/Login/AccountAndOrgCreation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"Login",
+						"AccountAndOrgCreation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ECT-7. CreateAccountAndOrg, Org Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"❌ empty org format caught\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    const errors = pm.response.json().errors;\r",
+							"\r",
+							"    for (let field in errors) {\r",
+							"        const message = errors[field][0];\r",
+							"\r",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {\r",
+							"            pm.expect(message).to.be.a('string');\r",
+							"        });\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function generateRandomString(length = 8) {\r",
+							"    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');\r",
+							"}\r",
+							"\r",
+							"const randomString = generateRandomString();\r",
+							"const email = `test_${randomString}@example.com`;\r",
+							"const org = `Org_${generateRandomString(10)}`;\r",
+							"\r",
+							"pm.collectionVariables.set(\"randomEmail\", email);\r",
+							"pm.collectionVariables.set(\"randomOrg\", org);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{randomEmail}}\",\r\n  \"password\": \"Abcdef1!\",\r\n  \"orgName\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/Login/AccountAndOrgCreation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"Login",
+						"AccountAndOrgCreation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BVT-1. CreateAccountAndOrg, Password min value valid length - 1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function generateRandomString(length = 8) {\r",
+							"    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');\r",
+							"}\r",
+							"\r",
+							"const randomString = generateRandomString();\r",
+							"const email = `test_${randomString}@example.com`;\r",
+							"const org = `Org_${generateRandomString(10)}`;\r",
+							"\r",
+							"pm.collectionVariables.set(\"randomEmail\", email);\r",
+							"pm.collectionVariables.set(\"randomOrg\", org);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"✅ Password should be at least 8 characters long\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"    const errors = pm.response.json().errors;\r",
+							"\r",
+							"    for (let field in errors) {\r",
+							"        const message = errors[field][0];\r",
+							"\r",
+							"        pm.test(`Error Message: ${field} → ${message}`, function () {\r",
+							"            pm.expect(message).to.be.a('string');\r",
+							"        });\r",
+							"    }\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -396,7 +881,71 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"email\": \"dfgdfg\",\r\n  \"password\": \"Jan123!\",\r\n  \"orgName\": \"TestOrg\"\r\n}",
+					"raw": "{\r\n  \"email\": \"{{randomEmail}}\",\r\n  \"password\": \"A1234!6\",\r\n  \"orgName\": \"{{randomOrg}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/Login/AccountAndOrgCreation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"Login",
+						"AccountAndOrgCreation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BVT-1. CreateAccountAndOrg, Password min value valid length",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function generateRandomString(length = 8) {\r",
+							"    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    return Array.from({length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');\r",
+							"}\r",
+							"\r",
+							"const randomString = generateRandomString();\r",
+							"const email = `test_${randomString}@example.com`;\r",
+							"const org = `Org_${generateRandomString(10)}`;\r",
+							"\r",
+							"pm.collectionVariables.set(\"randomEmail\", email);\r",
+							"pm.collectionVariables.set(\"randomOrg\", org);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"✅ Account and org created\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{randomEmail}}\",\r\n  \"password\": \"A1234!61\",\r\n  \"orgName\": \"{{randomOrg}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -422,6 +971,14 @@
 	],
 	"variable": [
 		{
+			"key": "randomEmail",
+			"value": ""
+		},
+		{
+			"key": "randomOrg",
+			"value": ""
+		},
+		{
 			"key": "publicKey",
 			"value": ""
 		},
@@ -431,14 +988,6 @@
 		},
 		{
 			"key": "jwtToken",
-			"value": ""
-		},
-		{
-			"key": "randomEmail",
-			"value": ""
-		},
-		{
-			"key": "randomOrg",
 			"value": ""
 		}
 	]
