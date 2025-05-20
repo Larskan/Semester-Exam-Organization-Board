@@ -221,7 +221,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.False(result.IsSuccess);
             Assert.Equal(403, result.StatusCode);
         }
-        // Test: Members as null and members.Count == 0 = 404//FIXME
+        // Test: Members as null and members.Count == 0 = 404
         [Fact]
         public async System.Threading.Tasks.Task GetTeamMembers_Returns404_IfNoMembersFound()
         {

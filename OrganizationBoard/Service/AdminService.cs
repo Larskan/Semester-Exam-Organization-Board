@@ -27,9 +27,10 @@ namespace OrganizationBoard.Service
         }
 
         #region User Management
-        // 2 Decisions = 3 Tests
+        // 3 Decisions = 4 Tests
         // Test: Admin as valid user, set to False = 403.
-        // Test: Admin as valid user, creating new user
+        // Test: Email doesnt exist = 400
+        // Test: Admin as valid user and email exists, creating new user
         // Test: Exception in try/catch = 500
         public async Task<OperationResponse<UserCreateDto>> CreateUser(UserCreateDto user, int requestingAdminId)
         {
@@ -64,10 +65,12 @@ namespace OrganizationBoard.Service
         }
 
 
-        // 3 Decisions = 4 Tests
+        // 5 Decisions = 6 Tests
         // Test: Admin as valid user, set to False = 403.
         // Test: existingUser as null = 404
-        // Test: existingUser as valid user
+        // Test: Email doesnt exist = 400
+        // Test: New email matches existing email = 400
+        // Test: Successsfully updating user
         // Test: failing to update user = 500
         public async Task<OperationResponse<UserCreateDto>> UpdateUser(UserCreateDto user, int requestingAdminId)
         {
@@ -79,7 +82,7 @@ namespace OrganizationBoard.Service
             {
                 bool emailExists = await _context.UserTables!.AnyAsync(u => u.Email == user.Email);
 
-        
+
 
                 var existingUser = await _context.UserTables!.FindAsync(user.UserID);
                 if (existingUser == null)
@@ -193,12 +196,12 @@ namespace OrganizationBoard.Service
         }
         #endregion User Management
 
-            #region Organization Management
-            // 3 Decisions = 4 Tests
-            // Test: Admin as valid user, set to False = 403.
-            // Test: existingOrg as null = 404
-            // Test: existingOrg as valid org
-            // Test: failing to update org = 500
+        #region Organization Management
+        // 3 Decisions = 4 Tests
+        // Test: Admin as valid user, set to False = 403.
+        // Test: existingOrg as null = 404
+        // Test: existingOrg as valid org
+        // Test: failing to update org = 500
         public async Task<OperationResponse<Organization>> UpdateOrganization(Organization organization, int requestingAdminId)
         {
             if (!await IsUserAdmin(requestingAdminId))

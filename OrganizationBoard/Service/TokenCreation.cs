@@ -26,7 +26,8 @@ namespace OrganizationBoard.Service
             {
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
-                new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "Team Member")
+                new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "Team Member"),
+                new Claim("TeamID", user.TeamID?.ToString() ?? "0") //to use: var teamId = User.Claims.FirstOrDefault(c => c.Type == "TeamID")?.Value;
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));

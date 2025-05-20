@@ -122,8 +122,9 @@ namespace OrganizationBoard.Service
         // 5 Decisions = 6 Tests.
         // Test: Leader as valid user, set to False = 403.
         // Test: Member as valid user, set to False = 403.
-        // Test: Members as null and members.Count == 0 = 404
-        // Test: Members as valid members
+        // Test: Admin as valid user, set to False = 403.
+        // Test: Members as null= 404
+        // Test: Members.Count == 0 = 404
         // Test: Exception in try/catch = 500
         public async Task<OperationResponse<List<UserDto>>> GetTeamMembers(int teamId, int requestingUserId)//Ask Jan regarding the header teamID
         {

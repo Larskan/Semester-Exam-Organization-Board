@@ -38,9 +38,8 @@ namespace OrganizationBoard.Controller
         {
             var adminId = GetUserIdFromClaims();
             if (adminId <= 0)
-            {
                 return BadRequest("Invalid user ID.");
-            }
+
             var response = await _adminService.GetUser(userId, adminId);
             if (response.IsSuccess)
                 return Ok(response.Data);
@@ -49,8 +48,12 @@ namespace OrganizationBoard.Controller
 
         [HttpGet("GetAllUsers")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllUsers(int adminId)
+        public async Task<IActionResult> GetAllUsers()
         {
+            var adminId = GetUserIdFromClaims();
+            if (adminId <= 0)
+                return BadRequest("Invalid user ID.");
+
             var response = await _adminService.GetAllUsers(adminId);
             if (response.IsSuccess)
                 return Ok(response.Data);
@@ -59,8 +62,12 @@ namespace OrganizationBoard.Controller
 
         [HttpPost("CreateUser")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto user, int adminId)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto user)
         {
+            var adminId = GetUserIdFromClaims();
+            if (adminId <= 0)
+                return BadRequest("Invalid user ID.");
+            
             var response = await _adminService.CreateUser(user, adminId);
             if (response.IsSuccess)
                 return StatusCode(response.StatusCode, response.Message);
@@ -69,8 +76,12 @@ namespace OrganizationBoard.Controller
 
         [HttpPut("UpdateUser")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUser([FromBody] UserCreateDto user, int adminId)
+        public async Task<IActionResult> UpdateUser([FromBody] UserCreateDto user)
         {
+            var adminId = GetUserIdFromClaims();
+            if (adminId <= 0)
+                return BadRequest("Invalid user ID.");
+            
             var response = await _adminService.UpdateUser(user, adminId);
             if (response.IsSuccess)
                 return Ok(response.Data);
@@ -79,8 +90,12 @@ namespace OrganizationBoard.Controller
 
         [HttpDelete("DeleteUser/{userId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteUser(int userId, int adminId)
+        public async Task<IActionResult> DeleteUser(int userId)
         {
+            var adminId = GetUserIdFromClaims();
+            if (adminId <= 0)
+                return BadRequest("Invalid user ID.");
+
             var response = await _adminService.DeleteUser(userId, adminId);
             if (response.IsSuccess)
                 return Ok(response.Message);
@@ -91,8 +106,12 @@ namespace OrganizationBoard.Controller
         #region Organization Management
         [HttpPut("UpdateOrganization")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateOrganization([FromBody] Organization organization, int adminId)
+        public async Task<IActionResult> UpdateOrganization([FromBody] Organization organization)
         {
+            var adminId = GetUserIdFromClaims();
+            if (adminId <= 0)
+                return BadRequest("Invalid user ID.");
+
             var response = await _adminService.UpdateOrganization(organization, adminId);
             if (response.IsSuccess)
                 return Ok(response.Data);

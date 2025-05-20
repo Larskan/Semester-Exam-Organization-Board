@@ -7,7 +7,7 @@ using OrganizationBoard.DTO;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
-    public class AdminServiceTest // Done: 0/10
+    public class AdminServiceTest // Done: 0/12
     {
         private OBDbContext GetInMemoryDbContext(string dbName = "TeamServiceTests")
         {
@@ -53,20 +53,26 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         // User as null and return 404
         // Present at: UpdateUser, DeleteUser, GetUser - Tests Saved: 2
 
+        // Email doesnt exist = 400
+        // Present at: CreateUser, UpdateUser - Tests Saved: 1
+
         #endregion Duplicate Tests(Where many methods have the same test)
 
         #region Tests for CreateUser
-        // 2 Decisions = 3 Tests
+        // 3 Decisions = 4 Tests
         // Test: Admin as valid user, set to False = 403.
-        // Test: Admin as valid user, creating new user
+        // Test: Email doesnt exist = 400
+        // Test: Admin as valid user and email exists, creating new user
         // Test: Exception in try/catch = 500
         #endregion Tests for CreateUser
 
         #region Tests for UpdateUser
-        // 3 Decisions = 4 Tests
+        // 5 Decisions = 6 Tests
         // Test: Admin as valid user, set to False = 403.
         // Test: existingUser as null = 404
-        // Test: existingUser as valid user
+        // Test: Email doesnt exist = 400
+        // Test: New email matches existing email = 400
+        // Test: Successsfully updating user
         // Test: failing to update user = 500
         #endregion Tests for UpdateUser
 
