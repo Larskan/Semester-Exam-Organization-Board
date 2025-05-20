@@ -24,11 +24,6 @@ namespace OrganizationBoard.Service
 
 
         #region Private check Methods
-        // private async Task<bool> IsUserInOrganization(int userId, int organizationId)
-        // {
-        //     var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
-        //     return user != null && user.OrganizationID == organizationId;
-        // }
         private async Task<bool> IsUserInTeam(int userId, int teamId)
         {
             var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == userId);
@@ -59,24 +54,19 @@ namespace OrganizationBoard.Service
         #endregion
 
         #region Board Management
-        // 3 Decisions = 4 Tests
-        // Test: Leader as valid user, set to False = 403.
-        // Test: User as null, return 404
-        // Test: User as valid user, creating new board
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<BoardDto>> CreateBoard(BoardDto board, int requestingUserId)
         {
             try
             {
                 return await _retryPolicy.ExecuteAsync(async () =>
                 {
-                    // Only Team Leaders can create boards
-                    if (!await IsUserTeamLeader(requestingUserId))
-                        return new OperationResponse<BoardDto>("Access Denied", false, 403);
-
                     var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == requestingUserId);
                     if (user == null)
                         return new OperationResponse<BoardDto>("User not found", false, 404);
+
+                    // Only Team Leaders can create boards
+                    if (!await IsUserTeamLeader(requestingUserId))
+                        return new OperationResponse<BoardDto>("Access Denied", false, 403);
 
                     var newBoard = new Board
                     {
@@ -97,12 +87,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 4 Decisions = 5 Tests
-        // Test: Is part of this team, set to False = 403.
-        // Test: Tasks as null, return 404
-        // Test: Tasks as empty, return 404
-        // Test: Success, getting all tasks. 
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<List<TaskReadDto>>> GetBoardTasks(int boardId, int requestingUserId)
         {
             try
@@ -112,8 +96,9 @@ namespace OrganizationBoard.Service
                     if (!await IsUserTeamMember(requestingUserId, boardId))
                         return new OperationResponse<List<TaskReadDto>>("Access Denied", false, 403);
 
+                    // This query with ToList() will never return null, so dont need check for tasks == null, just need to check if list is empty.
                     var tasks = _context.TaskTables!.Where(t => t.BoardID == boardId).ToList();
-                    if (tasks == null || tasks.Count == 0)
+                    if (tasks.Count == 0)
                         return new OperationResponse<List<TaskReadDto>>("No tasks found", false, 404);
 
                     var taskDtos = tasks.Select(t => new TaskReadDto
@@ -136,12 +121,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 4 Decisions = 5 Tests.
-        // Test: existingBoard as null, return 404
-        // Test: Team Leader access, denied, return 403
-        // Test: Team Member access, denied, return 403
-        // Test: Successfully updated board
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<BoardReadDto>> UpdateBoard(BoardReadDto board, int requestingUserId)
         {
             try
@@ -171,13 +150,6 @@ namespace OrganizationBoard.Service
 
         }
 
-        // 5 Decisions = 6 Tests.
-        // Test: Board as null, return 404
-        // Test: Team Leader access, denied, return 403
-        // Test: Team Member access, denied, return 403
-        // Test: Successfully deleted board
-        // Test: Board has tasks, delete tasks first
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<bool>> DeleteBoard(int boardId, int requestingUserId)
         {
             try
@@ -210,12 +182,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 4 Decisions = 5 Tests
-        // Test: Board as null, return 404
-        // Test: TeamID as null, return 404
-        // Test: Team Member access, denied, return 403
-        // Test: Successfully retrieved board
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<BoardReadDto>> GetBoard(int boardId, int requestingUserId)
         {
             try
@@ -245,12 +211,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 4 Decisions = 5 Tests
-        // Test: Team Member access, set to False = 403.
-        // Test: Boards as null, return 404
-        // Test: Boards as empty, return 404
-        // Test: Success, getting all boards.
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<List<BoardReadDto>>> GetTeamBoards(int teamId, int requestingUserId)
         {
             try
@@ -261,7 +221,7 @@ namespace OrganizationBoard.Service
                         return new OperationResponse<List<BoardReadDto>>("Access Denied", false, 403);
 
                     var boards = await _context.BoardTables!.Where(b => b.TeamID == teamId).ToListAsync();
-                    if (boards == null || boards.Count == 0)
+                    if (boards.Count == 0)
                         return new OperationResponse<List<BoardReadDto>>("No boards found", false, 404);
 
                     var boardDtos = boards.Select(b => new BoardReadDto
@@ -283,11 +243,6 @@ namespace OrganizationBoard.Service
         #endregion
 
         #region Task Management
-        // 3 Decisions = 4 Tests
-        // Test: Board as null, return 404
-        // Test: Team Leader access, denied, return 403
-        // Test: Create new task successfully
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<TaskDto>> CreateTask(TaskDto task, int boardId, int requestingUserId)
         {
             try
@@ -324,10 +279,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 2 Decisions = 3 Tests
-        // Test: Task as null, return 404
-        // Test: Successfully retrieved task
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<TaskReadDto>> GetTask(int taskId, int requestingUserId)
         {
             try
@@ -357,11 +308,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 3 Decisions = 4 Tests
-        // Test: Leader as valid user, set to False = 403.
-        // Test: existingTask as null = 404
-        // Test: Successfully updated task
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<TaskReadDto>> UpdateTask(TaskReadDto task, int requestingUserId)
         {
             try
@@ -402,11 +348,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 3 Decisions = 4 Tests
-        // Test: Leader as valid user, set to False = 403.
-        // Test: task as null = 404
-        // Test: Successfully deleted task
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<bool>> DeleteTask(int taskId, int requestingUserId)
         {
             try
@@ -433,12 +374,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 4 Decisions = 5 Tests
-        // Test: Leader as valid user, set to False = return 403.
-        // Test: task as null = 404
-        // Test: user as null = 404
-        // Test: Successfully assigned task
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<bool>> AssignTask(int taskId, int requestingUserId, int assignedToUserId)
         {
             try
@@ -474,11 +409,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 3 Decisions = 4 Tests
-        // Test: Task as null, return 404
-        // Test: IsUserInTask fails, return 403
-        // Test: Successfully marked task as complete
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<bool>> MarkTaskAsComplete(int taskId, int requestingUserId)
         {
             try
@@ -508,11 +438,6 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 3 Decisions = 4 Tests
-        // Test: Team Leader access, set to False = 403.
-        // Test: task as null = 404
-        // Test: Successfully confirmed task completion
-        // Test: Exception in try/catch = 500
         public async Task<OperationResponse<bool>> ConfirmTaskCompletion(int taskId, int requestingUserId)
         {
             try

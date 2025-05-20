@@ -31,8 +31,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             return context;
         }
 
-        // Removed Duplicate tests.
-
         #region Tests for CreateTeam
         // Test: Leader as valid user, set to False = 403.
         [Fact]
@@ -281,5 +279,4 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for RemoveUserFromTeam
 
     }
-
 }

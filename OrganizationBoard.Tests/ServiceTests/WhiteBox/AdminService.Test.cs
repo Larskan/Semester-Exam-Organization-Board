@@ -8,7 +8,7 @@ using OrganizationBoard.IService;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
-    public class AdminServiceTest // Done: 0/12
+    public class AdminServiceTest
     {
         private Mock<IBCryptService> _mockBCryptService;
         public AdminServiceTest()
