@@ -19,6 +19,10 @@ namespace OrganizationBoard.Service
         }
 
         #region Private Methods
+        private async Task<bool> IsUserAdmin(int userId){
+            var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
+            return user != null && user.RoleID == 1;
+        }
         private async Task<bool> IsUserTeamLeader(int userId)
         {
             var user = await _context.UserTables.FirstOrDefaultAsync(u => u.UserID == userId);
@@ -38,8 +42,8 @@ namespace OrganizationBoard.Service
         // Test: Exception in try/catch = 500
         public async Task<OperationResponse<TeamDto>> CreateTeam(TeamDto team, int requestingUserId)
         {
-            if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<TeamDto>("Only team leaders can update teams.", false, 403);
+            if (!await IsUserAdmin(requestingUserId))
+                return new OperationResponse<TeamDto>("Only admins can create teams.", false, 403);
 
             var user = await _context.UserTables!.FirstOrDefaultAsync(u => u.UserID == requestingUserId);
 
@@ -92,10 +96,10 @@ namespace OrganizationBoard.Service
         // Test: Team as null = 404
         // Test: Team as valid team
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<bool>> DeleteTeam(int teamId, int requestingUserId)
+        public async Task<OperationResponse<bool>> DeleteTeam(int teamId, int requestingUserId) //Ask Jan regarding the header teamID
         {
-            if (!await IsUserTeamLeader(requestingUserId))
-                return new OperationResponse<bool>("Only team leaders can Delete teams.", false, 403);
+            if (!await IsUserAdmin(requestingUserId))
+                return new OperationResponse<bool>("Only admins can delete teams.", false, 403);
 
             try
             {
@@ -115,15 +119,15 @@ namespace OrganizationBoard.Service
             }
         }
 
-        // 4 Decisions = 5 Tests.
+        // 5 Decisions = 6 Tests.
         // Test: Leader as valid user, set to False = 403.
         // Test: Member as valid user, set to False = 403.
         // Test: Members as null and members.Count == 0 = 404
         // Test: Members as valid members
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<List<UserDto>>> GetTeamMembers(int teamId, int requestingUserId)
+        public async Task<OperationResponse<List<UserDto>>> GetTeamMembers(int teamId, int requestingUserId)//Ask Jan regarding the header teamID
         {
-            if (!await IsUserTeamLeader(requestingUserId) && !await IsUserTeamMember(requestingUserId, teamId))
+            if (!await IsUserTeamLeader(requestingUserId) && !await IsUserTeamMember(requestingUserId, teamId) && !await IsUserAdmin(requestingUserId))
             {
                 return new OperationResponse<List<UserDto>>("Access Denied.", false, 403);
             }
@@ -136,11 +140,8 @@ namespace OrganizationBoard.Service
 
                 var memberDtos = members.Select(u => new UserDto
                 {
-                    UserID = u.UserID,
                     Email = u.Email,
-                    Password = u.Password,
                     RoleID = u.RoleID,
-                    OrganizationID = u.OrganizationID,
                     TeamID = u.TeamID
                 }).ToList();
 
@@ -158,9 +159,9 @@ namespace OrganizationBoard.Service
         // Test: userToAssign as null = 404
         // Test: team and userToAssign as valid
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<bool>> AssignUserToTeam(int teamId, int userIdToAssign, int requestingLeaderId)
+        public async Task<OperationResponse<bool>> AssignUserToTeam(int teamId, int userIdToAssign, int requestingAdminId)//Ask Jan regarding the header teamID
         {
-            if (!await IsUserTeamLeader(requestingLeaderId))
+            if (!await IsUserAdmin(requestingAdminId))
                 return new OperationResponse<bool>("Access Denied.", false, 403);
 
             try
@@ -190,9 +191,9 @@ namespace OrganizationBoard.Service
         // Test: userToAssign as null = 404
         // Test: team and userToAssign as valid
         // Test: Exception in try/catch = 500
-        public async Task<OperationResponse<bool>> RemoveUserFromTeam(int teamId, int userIdToRemove, int requestingLeaderId)
+        public async Task<OperationResponse<bool>> RemoveUserFromTeam(int teamId, int userIdToRemove, int requestingAdminId)//Ask Jan regarding the header teamID
         {
-            if (!await IsUserTeamLeader(requestingLeaderId))
+            if (!await IsUserAdmin(requestingAdminId))
                 return new OperationResponse<bool>("Access Denied.", false, 403);
 
             try

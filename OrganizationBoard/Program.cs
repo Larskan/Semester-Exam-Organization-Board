@@ -10,8 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using OrganizationBoard.Service;
-using OrganizationBoard.IService;
 
 var builder = WebApplication.CreateBuilder(args);
 

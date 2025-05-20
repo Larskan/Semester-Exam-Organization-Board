@@ -19,7 +19,7 @@ namespace OrganizationBoard.Controller
 
         #region Team Management
         [HttpGet("GetTeamMembers/{teamId}")]
-        [Authorize(Roles = "Team Leader, Team Member")]
+        [Authorize(Roles = "Team Leader, Team Member, Admin")]
         public async Task<IActionResult> GetTeamMembers(int teamId, int userId)
         {
             var response = await _teamService.GetTeamMembers(teamId, userId);
@@ -29,7 +29,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpPost("CreateTeam")]
-        [Authorize(Roles = "Team Leader")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateTeam([FromBody] TeamDto team, int userId)
         {
             var response = await _teamService.CreateTeam(team, userId);
@@ -49,7 +49,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpDelete("DeleteTeam/{teamId}")]
-        [Authorize(Roles = "Team Leader")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTeam(int teamId, int userId)
         {
             var response = await _teamService.DeleteTeam(teamId, userId);
@@ -59,7 +59,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpPost("AssignUserToTeam")]
-        [Authorize(Roles = "Team Leader")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignUserToTeam(int teamId, int userIdToAssign, int requestingLeaderId)
         {
             var response = await _teamService.AssignUserToTeam(teamId, userIdToAssign, requestingLeaderId);
@@ -69,7 +69,7 @@ namespace OrganizationBoard.Controller
         }
 
         [HttpDelete("RemoveUserFromTeam")]
-        [Authorize(Roles = "Team Leader")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveUserFromTeam(int teamId, int userIdToRemove, int requestingLeaderId)
         {
             var response = await _teamService.RemoveUserFromTeam(teamId, userIdToRemove, requestingLeaderId);

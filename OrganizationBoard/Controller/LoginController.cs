@@ -39,6 +39,10 @@ public class LoginController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         try
         {
             var user = await _retryPolicy.ExecuteAsync(() => _loginService.UserCheck(dto));
@@ -69,6 +73,10 @@ public class LoginController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> CreateAccountAndOrg([FromBody] AccountAndOrgDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         try
         {
             await _retryPolicy.ExecuteAsync(() => _loginService.CreateAccountAndOrg(dto));
@@ -81,20 +89,6 @@ public class LoginController : ControllerBase
         }
     }
 
-    [HttpPost("Team Member and Admin")]
-    [Authorize(Roles = "Team Member,Admin")]
-    public IActionResult CreateTask()
-    {
-        return Ok("Task created by Team Member!");
-    }
-
-    [HttpGet("AdminOnly")]
-    [Authorize(Roles = "Admin")]
-    public IActionResult GetAdminData()
-    {
-        return Ok("Only admins see this.");
-    }
-
     [HttpGet("public-key")]
     [AllowAnonymous]
     public IActionResult GetPublicKey()
@@ -103,11 +97,11 @@ public class LoginController : ControllerBase
         return Ok(new { publicKey });
     }
 
-    [HttpGet("EncryptPasswordBummyForWebsideResponsabilety")]
+    [HttpPost("EncryptPasswordBummyForWebsideResponsabilety")]
     [AllowAnonymous]
-    public IActionResult EncryptPasswordBummyForWebsideResponsabilety(string password, string publicKeyPem)
+    public IActionResult EncryptPasswordBummyForWebsideResponsabilety([FromBody]EncryptPasswordBummyForWebsideResponsabiletyDto dto)
     {
-        var Encrypted = _rsaService.EncryptOutside(password, publicKeyPem);
+        var Encrypted = _rsaService.EncryptOutside(dto.Password, dto.PublicKeyPem);
         return Ok(new { Encrypted });
     }
 }

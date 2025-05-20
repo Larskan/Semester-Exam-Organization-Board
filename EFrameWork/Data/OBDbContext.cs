@@ -95,9 +95,9 @@ namespace EFramework.Data
 
             // Pass = 1234
             modelBuilder.Entity<User>().HasData(
-                new User {UserID = 1, Email = "Mail1", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", RoleID = 1, OrganizationID = 1},
-                new User {UserID = 2, Email = "Mail2", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", TeamID = 2, RoleID = 2, OrganizationID = 1},
-                new User {UserID = 3, Email = "Mail3", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", TeamID = 1, RoleID = 3, OrganizationID = 1}
+                new User {UserID = 1, Email = "Mail1@Example.com", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", RoleID = 1, OrganizationID = 1},
+                new User {UserID = 2, Email = "Mail2@Example.com", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", TeamID = 2, RoleID = 2, OrganizationID = 1},
+                new User {UserID = 3, Email = "Mail3@Example.com", Password = "$2a$11$zSZaqcPjjtI3tWf0hHEVbey9fBLldqw/6OoCGvia5jCSLLDUkW.NW", TeamID = 1, RoleID = 3, OrganizationID = 1}
             );
         }
     }
