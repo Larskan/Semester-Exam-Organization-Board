@@ -97,11 +97,11 @@ public class LoginController : ControllerBase
         return Ok(new { publicKey });
     }
 
-    [HttpGet("EncryptPasswordBummyForWebsideResponsabilety")]
+    [HttpPost("EncryptPasswordBummyForWebsideResponsabilety")]
     [AllowAnonymous]
-    public IActionResult EncryptPasswordBummyForWebsideResponsabilety(string password, string publicKeyPem)
+    public IActionResult EncryptPasswordBummyForWebsideResponsabilety([FromBody]EncryptPasswordBummyForWebsideResponsabiletyDto dto)
     {
-        var Encrypted = _rsaService.EncryptOutside(password, publicKeyPem);
+        var Encrypted = _rsaService.EncryptOutside(dto.Password, dto.PublicKeyPem);
         return Ok(new { Encrypted });
     }
 }
