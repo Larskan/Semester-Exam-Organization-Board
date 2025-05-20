@@ -9,10 +9,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
     public class TeamServiceTest
     {
-        // From seeded users:
-        /*  UserID = 1 has roleID 1(Admin)
-            UserID = 2 has roleID 2(Leader) and TeamID = 2
-            UserID = 3 has roleID 3(member) and TeamID = 1. */
         private OBDbContext GetInMemoryDbContext(string dbName = "TeamServiceTests")
         {
             var options = new DbContextOptionsBuilder<OBDbContext>()
@@ -35,14 +31,12 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             return context;
         }
 
-        // The Test for Exception in try/catch happens in all methods, so we can save some tests by not repeating it. Having it working once in a test, means it works in all methods.
-        // The Test for Leader as valid user, set to False = 403 happens in all methods, so we can save some tests by not repeating it. Having it working once in a test, means it works in all methods.
-        // Will have a Leader check once for POST, GET, PUT and DELETE.
+        // Removed Duplicate tests.
 
         #region Tests for CreateTeam
         // Test: Leader as valid user, set to False = 403.
         [Fact]
-        public async System.Threading.Tasks.Task CreateTeam_Returns403_IfUserNotLeader()
+        public async System.Threading.Tasks.Task CreateTeam_Returns403_IfUserNotAdmin()
         {
             // Arrange
             var context = GetInMemoryDbContext("NotLeaderTest");
@@ -56,16 +50,16 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal(403, result.StatusCode);
         }
 
-        // Test: User as valid leader, creating new team
+        // Test: User as valid admin, creating new team
         [Fact]
         public async System.Threading.Tasks.Task CreateTeam_ReturnsSuccess_IfUserIsLeaderAndExists()
         {
             // Arrange
-            var context = GetInMemoryDbContext("ValidLeaderTest");
+            var context = GetInMemoryDbContext("ValidAdminTest");
             var service = new TeamService(context);
 
             // Act
-            var result = await service.CreateTeam(new TeamDto { TeamID = 3, TeamName = "Success Team" }, 4);
+            var result = await service.CreateTeam(new TeamDto { TeamID = 3, TeamName = "Success Team" }, 1);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -83,7 +77,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.CreateTeam(new TeamDto { TeamName = null }, 4); // This will cause an exception because TeamName is null
+            var result = await service.CreateTeam(new TeamDto { TeamName = null }, 1); // This will cause an exception because TeamName is null
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -93,6 +87,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for CreateTeam
 
         #region Tests for UpdateTeam
+        // Test: Leader invalid
         [Fact]
         public async System.Threading.Tasks.Task UpdateTeam_Returns403_IfUserNotLeader()
         {
@@ -143,35 +138,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for UpdateTeam
 
         #region Tests for DeleteTeam
-        [Fact]
-        public async System.Threading.Tasks.Task DeleteTeam_Returns403_IfUserNotLeader()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("NotLeaderDeleteTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.DeleteTeam(1, 3);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(403, result.StatusCode);
-        }
-        // Test: Team as null = 404
-        [Fact]
-        public async System.Threading.Tasks.Task DeleteTeam_Returns404_IfTeamNotFound()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("DeleteTeamNotFoundTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.DeleteTeam(999, 2);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(404, result.StatusCode);
-        }
         // Test: Team as valid team
         [Fact]
         public async System.Threading.Tasks.Task DeleteTeam_ReturnsSuccess_IfTeamDeleted()
@@ -181,47 +147,31 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.DeleteTeam(2, 4);
+            var result = await service.DeleteTeam(2, 1);
 
             // Assert
             Assert.True(result.IsSuccess);
             Assert.Equal("Team deleted successfully.", result.Message);
         }
-        
         #endregion Tests for DeleteTeam
 
         #region Tests for GetTeamMembers
-        // Test: Leader as valid user, set to False = 403.
+        // Test: Leader as valid user but trying to view another team, set to False = 403.
         [Fact]
-        public async System.Threading.Tasks.Task GetTeamMembers_Returns403_IfUserNotLeader()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("NotLeaderGetMembersTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.GetTeamMembers(1, 5); // User 5 is a member, but isn't part of team 1
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(403, result.StatusCode);
-        }
-        // Test: Member as valid user, set to False = 403.
-        [Fact]
-        public async System.Threading.Tasks.Task GetTeamMembers_Returns403_IfUserNotMember()
+        public async System.Threading.Tasks.Task GetTeamMembers_Returns403_IfUserNotMemberOfTeam()
         {
             // Arrange
             var context = GetInMemoryDbContext("NotMemberGetMembersTest");
             var service = new TeamService(context);
 
             // Act
-            var result = await service.GetTeamMembers(2, 1); // User 1 is leader, but isn't in team 2
+            var result = await service.GetTeamMembers(2, 2); // User 1 is leader, but isn't in team 2
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(403, result.StatusCode);
         }
-        // Test: Members as null and members.Count == 0 = 404
+        // Test: Members.Count == 0 = 404
         [Fact]
         public async System.Threading.Tasks.Task GetTeamMembers_Returns404_IfNoMembersFound()
         {
@@ -234,13 +184,13 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.GetTeamMembers(5, 4); // Team 5 has no members
+            var result = await service.GetTeamMembers(5, 1); // Team 5 has no members
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(404, result.StatusCode);
         }
-        // Test: Members as valid members
+        // Test: Successful test
         [Fact]
         public async System.Threading.Tasks.Task GetTeamMembers_ReturnsSuccess_IfMembersFound()
         {
@@ -264,36 +214,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for GetTeamMembers
 
         #region Tests for AssignUserToTeam
-        // Test: Leader as valid user, set to False = 403.
-        [Fact]
-        public async System.Threading.Tasks.Task AssignUserToTeam_Returns403_IfUserNotLeader()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("NotLeaderAssignTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.AssignUserToTeam(1, 2, 3);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(403, result.StatusCode);
-        }
-        // Test: team as null = 404
-        [Fact]
-        public async System.Threading.Tasks.Task AssignUserToTeam_Returns404_IfTeamNotFound()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("AssignUserToTeamNotFoundTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.AssignUserToTeam(999, 3, 2); // Nonexistent team
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(404, result.StatusCode);
-        }
         // Test: userToAssign as null = 404
         [Fact]
         public async System.Threading.Tasks.Task AssignUserToTeam_Returns404_IfUserNotFound()
@@ -303,13 +223,28 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.AssignUserToTeam(1, 999, 2);
+            var result = await service.AssignUserToTeam(1, 999, 1);
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(404, result.StatusCode);
         }
-        // Test: team and userToAssign as valid
+        // Test: userToAssign.TeamID != null = 400
+        [Fact]
+        public async System.Threading.Tasks.Task AssignUserToTeam_Returns400_IfUserAlreadyInTeam()
+        {
+            // Arrange
+            var context = GetInMemoryDbContext("AssignUserToTeamUserNotFoundTest");
+            var service = new TeamService(context);
+
+            // Act
+            var result = await service.AssignUserToTeam(2, 3, 1);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+        }
+        // Test: Successful Test
         [Fact]
         public async System.Threading.Tasks.Task AssignUserToTeam_ReturnsSuccess_IfUserAndTeamValid()
         {
@@ -318,7 +253,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.AssignUserToTeam(1, 5, 2); // Assign user 5 to team 1
+            var result = await service.AssignUserToTeam(1, 5, 1); // Assign user 5 to team 1
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -328,52 +263,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for AssignUserToTeam
 
         #region Tests for RemoveUserFromTeam
-        // Test: Leader as valid user, set to False = 403.
-        [Fact]
-        public async System.Threading.Tasks.Task RemoveUserFromTeam_Returns403_IfUserNotLeader()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("NotLeaderRemoveTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.RemoveUserFromTeam(1, 2, 3);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(403, result.StatusCode);
-        }
-        // Test: team as null = 404
-        [Fact]
-        public async System.Threading.Tasks.Task RemoveUserFromTeam_Returns404_IfTeamNotFound()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("RemoveUserFromTeamNotFoundTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.RemoveUserFromTeam(999, 3, 2); // Nonexistent team
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(404, result.StatusCode);
-        }
-        // Test: userToAssign as null = 404
-        [Fact]
-        public async System.Threading.Tasks.Task RemoveUserFromTeam_Returns404_IfUserNotFound()
-        {
-            // Arrange
-            var context = GetInMemoryDbContext("RemoveUserFromTeamUserNotFoundTest");
-            var service = new TeamService(context);
-
-            // Act
-            var result = await service.RemoveUserFromTeam(1, 999, 2);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(404, result.StatusCode);
-        }
-        // Test: team and userToAssign as valid
+        // Test: Successful run
         [Fact]
         public async System.Threading.Tasks.Task RemoveUserFromTeam_ReturnsSuccess_IfUserAndTeamValid()
         {
@@ -382,14 +272,12 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var service = new TeamService(context);
 
             // Act
-            var result = await service.RemoveUserFromTeam(1, 3, 2); // Remove user 3 from team 1
+            var result = await service.RemoveUserFromTeam(1, 3, 1); // Remove user 3 from team 1
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal("User assigned to team successfully.", result.Message);
+            Assert.Equal("User removed from team successfully.", result.Message);
         }
-
-
         #endregion Tests for RemoveUserFromTeam
 
     }

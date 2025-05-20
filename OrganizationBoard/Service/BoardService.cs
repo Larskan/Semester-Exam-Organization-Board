@@ -98,7 +98,7 @@ namespace OrganizationBoard.Service
         }
 
         // 4 Decisions = 5 Tests
-        // Test: Team Member access, set to False = 403.
+        // Test: Is part of this team, set to False = 403.
         // Test: Tasks as null, return 404
         // Test: Tasks as empty, return 404
         // Test: Success, getting all tasks. 

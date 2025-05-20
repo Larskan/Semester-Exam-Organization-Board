@@ -59,7 +59,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Unique Tests(Where each method has a unique test)
 
         #region Tests for CreateBoard
-        // 3 Decisions = 4 Tests
         // Test: Leader as valid user, set to False = 403.
         // Test: User as null, return 404
         // Test: Leader as valid user, creating new board
@@ -67,105 +66,81 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for CreateBoard
 
         #region Tests for GetBoardTasks
-        // 4 Decisions = 5 Tests
         // Test: Team Member access, set to False = 403.
         // Test: Tasks as null, return 404
         // Test: Tasks as empty, return 404
         // Test: Success, getting all tasks. 
-        // Test: Exception in try/catch = 500
         #endregion Tests for GetBoardTasks
 
         #region Tests for UpdateBoard
-        // 4 Decisions = 5 Tests.
         // Test: existingBoard as null, return 404
         // Test: Team Leader access, denied, return 403
         // Test: Team Member access, denied, return 403
         // Test: Successfully updated board
-        // Test: Exception in try/catch = 500
         #endregion Tests for UpdateBoard
 
         #region Tests for DeleteBoard
-        // 5 Decisions = 6 Tests.
         // Test: Board as null, return 404
         // Test: Team Leader access, denied, return 403
         // Test: Team Member access, denied, return 403
         // Test: Successfully deleted board
         // Test: Board has tasks, delete tasks first
-        // Test: Exception in try/catch = 500
         #endregion Tests for DeleteBoard
 
         #region Tests for GetBoard
-        // 4 Decisions = 5 Tests
         // Test: Board as null, return 404
         // Test: TeamID as null, return 404
         // Test: Team Member access, denied, return 403
         // Test: Successfully retrieved board
-        // Test: Exception in try/catch = 500
         #endregion Tests for GetBoard
 
         #region Tests for GetTeamBoards
-        // 4 Decisions = 5 Tests
         // Test: Team Member access, set to False = 403.
         // Test: Boards as null, return 404
         // Test: Boards as empty, return 404
         // Test: Success, getting all boards.
-        // Test: Exception in try/catch = 500
         #endregion Tests for GetTeamBoards
 
         #region Tests for CreateTask
-        // 3 Decisions = 4 Tests
         // Test: Board as null, return 404
         // Test: Team Leader access, denied, return 403
         // Test: Create new task successfully
-        // Test: Exception in try/catch = 500
         #endregion Tests for CreateTask
 
         #region Tests for GetTask
-        // 2 Decisions = 3 Tests
         // Test: Task as null, return 404
         // Test: Successfully retrieved task
-        // Test: Exception in try/catch = 500
         #endregion Tests for GetTask
 
         #region Tests for UpdateTask
-        // 3 Decisions = 4 Tests
         // Test: Leader as valid user, set to False = 403.
         // Test: existingTask as null = 404
         // Test: Successfully updated task
-        // Test: Exception in try/catch = 500
         #endregion Tests for UpdateTask
 
         #region Tests for DeleteTask
-        // 3 Decisions = 4 Tests
         // Test: Leader as valid user, set to False = 403.
         // Test: task as null = 404
         // Test: Successfully deleted task
-        // Test: Exception in try/catch = 500
         #endregion Tests for DeleteTask
 
         #region Tests for AssignTask
-        // 4 Decisions = 5 Tests
         // Test: Leader as valid user, set to False = return 403.
         // Test: task as null = 404
         // Test: user as null = 404
         // Test: Successfully assigned task
-        // Test: Exception in try/catch = 500
         #endregion Tests for AssignTask
 
         #region Tests for MarkTaskAsComplete
-        // 3 Decisions = 4 Tests
         // Test: Task as null, return 404
         // Test: IsUserInTask fails, return 403
         // Test: Successfully marked task as complete
-        // Test: Exception in try/catch = 500
         #endregion Tests for MarkTaskAsComplete
 
         #region ConfirmTaskCompletion
-        // 3 Decisions = 4 Tests
         // Test: Team Leader access, set to False = 403.
         // Test: task as null = 404
         // Test: Successfully confirmed task completion
-        // Test: Exception in try/catch = 500
         #endregion ConfirmTaskCompletion
 
 

@@ -59,7 +59,6 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Duplicate Tests(Where many methods have the same test)
 
         #region Tests for CreateUser
-        // 3 Decisions = 4 Tests
         // Test: Admin as valid user, set to False = 403.
         // Test: Email doesnt exist = 400
         // Test: Admin as valid user and email exists, creating new user
@@ -67,44 +66,26 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         #endregion Tests for CreateUser
 
         #region Tests for UpdateUser
-        // 5 Decisions = 6 Tests
-        // Test: Admin as valid user, set to False = 403.
         // Test: existingUser as null = 404
-        // Test: Email doesnt exist = 400
         // Test: New email matches existing email = 400
         // Test: Successsfully updating user
-        // Test: failing to update user = 500
         #endregion Tests for UpdateUser
 
         #region Tests for DeleteUser
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
-        // Test: existingUser as null = 404
         // Test: existingUser as valid user, deleting user. 
-        // Test: failing to update user = 500
         #endregion Tests for DeleteUser
 
         #region Tests for GetUser
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
         // Test: Admin as valid user, getting user
-        // Test: user as null = 404
-        // Test: failing to get user = 500
         #endregion Tests for GetUser
 
         #region Tests for GetAllUsers
-        // 2 Decisions = 3 Tests
-        // Test: Admin as valid user, set to False = 403.
         // Test: Admin as valid user, getting all users
-        // Test: Exception in try/catch = 500
         #endregion Tests for GetAllUsers
 
         #region Tests for UpdateOrganization
-        // 3 Decisions = 4 Tests
-        // Test: Admin as valid user, set to False = 403.
         // Test: existingOrg as null = 404
         // Test: existingOrg as valid org
-        // Test: failing to update org = 500
         #endregion Tests for UpdateOrganization
     }
 }
