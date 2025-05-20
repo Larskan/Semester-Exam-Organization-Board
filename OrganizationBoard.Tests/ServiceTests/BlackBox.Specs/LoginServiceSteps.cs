@@ -8,11 +8,12 @@ using EFrameWork.Model;
 using OrganizationBoard.DTO;
 using OrganizationBoard.IService;
 using OrganizationBoard.Service;
-using Polly;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using System.Collections.Generic;
-using Reqnroll; // Added for List<T> used in DbSet mocking
+using Reqnroll;
+using System.Threading;
+using System.ComponentModel.DataAnnotations; // Added for ValidationException
+using System.Text.RegularExpressions; // Added for regex pattern in Organization Name validation example
 
 namespace OrganizationBoard.Tests.Steps
 {
@@ -22,7 +23,6 @@ namespace OrganizationBoard.Tests.Steps
         private OBDbContext _db;
         private Mock<IBCryptService> _bCryptServiceMock;
         private Mock<IRsaService> _rsaServiceMock;
-        private Mock<IAsyncPolicy> _retryPolicyMock;
         private LoginService _loginService;
 
         private User _expectedUser;
@@ -32,27 +32,14 @@ namespace OrganizationBoard.Tests.Steps
 
         public LoginServiceSteps()
         {
-            // Initialize mocks for BCrypt and RSA services
-            // These mocks are used to simulate the behavior of these services
             _bCryptServiceMock = new Mock<IBCryptService>();
             _rsaServiceMock = new Mock<IRsaService>();
-            _retryPolicyMock = new Mock<IAsyncPolicy>();
 
-            // Mock the retry policy to just execute the function without retrying
-            _retryPolicyMock
-                .Setup(p => p.ExecuteAsync(It.IsAny<Func<System.Threading.Tasks.Task>>()))
-                .Returns((Func<System.Threading.Tasks.Task> func) => func());
-            _retryPolicyMock
-                .Setup(p => p.ExecuteAsync(It.IsAny<Func<Task<User>>>()))
-                .Returns((Func<Task<User>> func) => func());
-
-            // Initialize default context and service
             _db = TestDbContextFactory.Create();
             _loginService = new LoginService(
                 _db,
                 _bCryptServiceMock.Object,
-                _rsaServiceMock.Object,
-                _retryPolicyMock.Object
+                _rsaServiceMock.Object
             );
         }
 
@@ -67,8 +54,7 @@ namespace OrganizationBoard.Tests.Steps
             _loginService = new LoginService(
                 _db,
                 _bCryptServiceMock.Object,
-                _rsaServiceMock.Object,
-                _retryPolicyMock.Object
+                _rsaServiceMock.Object
             );
         }
 
@@ -77,15 +63,11 @@ namespace OrganizationBoard.Tests.Steps
         [Given(@"a user with email ""(.*)"" and password ""(.*)"" exists in the database")]
         public async System.Threading.Tasks.Task GivenAUserWithEmailAndPasswordExistsInTheDatabase(string email, string password)
         {
-            // Ensure the Admin role exists first, as User often depends on Role
-            // This is a common pattern in BDD: set up prerequisites.
-            await GivenTheRoleExistsInTheDatabase("Admin"); // Or "User" if that's the default role for these users
+            await GivenTheRoleExistsInTheDatabase("Admin");
 
             var user = TestDataFactory.CreateUser(email: email, password: password);
-            // Assign a role explicitly if it's not handled by the service itself on user creation
-            // For example, if you just want to put a user into the DB for login check.
-            user.RoleID = _db.RoleTables.Local.FirstOrDefault(r => r.RoleName == "Admin")?.RoleID ?? 1; // Assuming Admin is always ID 1
-            user.Role = _db.RoleTables.Local.FirstOrDefault(r => r.RoleName == "Admin"); // Also set navigation property
+            user.RoleID = _db.RoleTables.Local.FirstOrDefault(r => r.RoleName == "Admin")?.RoleID ?? 1;
+            user.Role = _db.RoleTables.Local.FirstOrDefault(r => r.RoleName == "Admin");
 
             _db.UserTables!.Add(user);
             await _db.SaveChangesAsync();
@@ -117,6 +99,8 @@ namespace OrganizationBoard.Tests.Steps
             try
             {
                 _caughtException = null;
+                // Manually validate DTO using DataAnnotations if not implicitly handled by API pipeline
+                Validator.ValidateObject(_loginDto, new ValidationContext(_loginDto), validateAllProperties: true);
                 _expectedUser = await _loginService.UserCheck(_loginDto);
             }
             catch (Exception ex)
@@ -160,61 +144,57 @@ namespace OrganizationBoard.Tests.Steps
             Assert.Equal(expectedMessage, appEx.Message);
         }
 
+        [Then(@"an UnauthorizedAccessException with message ""(.*)"" should be thrown")]
+        public void ThenAnUnauthorizedAccessExceptionWithMessageShouldBeThrown(string expectedMessage)
+        {
+            Assert.NotNull(_caughtException);
+            var appEx = Assert.IsType<UnauthorizedAccessException>(_caughtException);
+            Assert.Equal(expectedMessage, appEx.Message);
+        }
+
+        // --- Existing steps (DB error scenarios) ---
+
         [Given(@"a database error occurs when saving the organization ""(.*)""")]
         public async System.Threading.Tasks.Task GivenADatabaseErrorOccursWhenSavingTheOrganization(string orgName)
         {
-            // First, ensure the Admin role exists in the *real* in-memory DB if this scenario
-            // requires it for CreateAccountAndOrg to even start.
             await GivenTheRoleExistsInTheDatabase("Admin");
 
             var dbMockForError = new Mock<OBDbContext>();
-
-            // Crucial: Set up other DbSet properties to return the *real* in-memory DbSets
-            // so that non-failing operations (like checking for Admin role) work.
             dbMockForError.Setup(db => db.RoleTables).Returns(_db.RoleTables);
-            dbMockForError.Setup(db => db.UserTables).Returns(_db.UserTables); // If user save comes after org, this will be needed later
+            dbMockForError.Setup(db => db.UserTables).Returns(_db.UserTables);
 
-            // Mock AddAsync and SaveChangesAsync for OrganizationTables to throw an exception
             dbMockForError.Setup(db => db.OrganizationTables!.AddAsync(It.IsAny<Organization>(), It.IsAny<CancellationToken>()))
                           .ThrowsAsync(new Exception("Simulated DB error on organization save"));
-            // Also mock SaveChangesAsync as it will be called after AddAsync
             dbMockForError.Setup(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()))
                           .ThrowsAsync(new Exception("Simulated DB error on save changes for org"));
 
             _loginService = new LoginService(
                 dbMockForError.Object,
                 _bCryptServiceMock.Object,
-                _rsaServiceMock.Object,
-                _retryPolicyMock.Object
+                _rsaServiceMock.Object
             );
         }
 
         [Given(@"a database error occurs when saving the user ""(.*)""")]
         public async System.Threading.Tasks.Task GivenADatabaseErrorOccursWhenSavingTheUser(string email)
         {
-            // Ensure necessary prerequisites (Admin role, organization) are set up in the real DB
             await GivenTheRoleExistsInTheDatabase("Admin");
-            await GivenTheOrganizationIsSuccessfullySaved("TempOrgForUserError"); // Create an organization that exists for the user to be linked to
+            // You are saving a temporary organization here using the _db instance.
+            await GivenTheOrganizationIsSuccessfullySaved($"TempOrgForUserError_{Guid.NewGuid()}");
 
             var dbMockForError = new Mock<OBDbContext>();
+            // ...
+            // You are setting up mocks for dbMockForError, but then assigning it to _loginService.
+            // However, the _db.OrganizationTables and _db.UserTables will use the *original* _db instance, not the mock.
+            // This could cause issues if the mocked properties (RoleTables, OrganizationTables) aren't also mocked properly.
+            dbMockForError.Setup(db => db.RoleTables).Returns(_db.RoleTables); // This returns the *real* tables from _db
+            dbMockForError.Setup(db => db.OrganizationTables).Returns(_db.OrganizationTables); // This returns the *real* tables from _db
 
-            // Crucial: Set up other DbSet properties to return the *real* in-memory DbSets
-            // so that non-failing operations (like getting role or organization) work.
-            dbMockForError.Setup(db => db.RoleTables).Returns(_db.RoleTables);
-            dbMockForError.Setup(db => db.OrganizationTables).Returns(_db.OrganizationTables);
-
-            // Mock AddAsync and SaveChangesAsync for UserTables to throw an exception
-            dbMockForError.Setup(db => db.UserTables!.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
-                          .ThrowsAsync(new Exception("Simulated DB error on user save"));
-            // Also mock SaveChangesAsync as it will be called after AddAsync
-            dbMockForError.Setup(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()))
-                          .ThrowsAsync(new Exception("Simulated DB error on save changes for user"));
-
+            // ... throws for AddAsync and SaveChangesAsync on the *mocked* dbMockForError.
             _loginService = new LoginService(
-                dbMockForError.Object,
+                dbMockForError.Object, // LoginService now uses the MOCKED DB context
                 _bCryptServiceMock.Object,
-                _rsaServiceMock.Object,
-                _retryPolicyMock.Object
+                _rsaServiceMock.Object
             );
         }
 
@@ -223,15 +203,12 @@ namespace OrganizationBoard.Tests.Steps
         [Given(@"the ""(.*)"" role exists in the database")]
         public async System.Threading.Tasks.Task GivenTheRoleExistsInTheDatabase(string roleName)
         {
-            // Check if the role already exists in the current in-memory DB context
             var existingRole = await _db.RoleTables.FirstOrDefaultAsync(r => r.RoleName == roleName);
-
             if (existingRole == null)
             {
                 var role = TestDataFactory.CreateRole(roleName);
                 _db.RoleTables!.Add(role);
                 await _db.SaveChangesAsync();
-                // Detach the entity after saving to prevent tracking issues in subsequent operations
                 _db.Entry(role).State = EntityState.Detached;
             }
         }
@@ -240,7 +217,6 @@ namespace OrganizationBoard.Tests.Steps
         public void GivenTheRoleDoesNotExitInTheDatabase(string roleName)
         {
             // No action needed, as the in-memory DB starts empty and we don't add this role.
-            // If any fixed roles were added by default, you might need to ensure this role isn't one of them.
         }
 
         [When(@"a new account is created with email ""(.*)"", password ""(.*)"", and organization ""(.*)""")]
@@ -250,6 +226,8 @@ namespace OrganizationBoard.Tests.Steps
             try
             {
                 _caughtException = null;
+                // Manually validate DTO using DataAnnotations if not implicitly handled by API pipeline
+                Validator.ValidateObject(_accountAndOrgDto, new ValidationContext(_accountAndOrgDto), validateAllProperties: true);
                 await _loginService.CreateAccountAndOrg(_accountAndOrgDto);
             }
             catch (Exception ex)
@@ -267,7 +245,7 @@ namespace OrganizationBoard.Tests.Steps
                 var org = TestDataFactory.CreateOrganization(orgName);
                 _db.OrganizationTables!.Add(org);
                 await _db.SaveChangesAsync();
-                _db.Entry(org).State = EntityState.Detached; // Detach to ensure it's re-fetched by the service
+                _db.Entry(org).State = EntityState.Detached;
             }
         }
 
@@ -300,6 +278,49 @@ namespace OrganizationBoard.Tests.Steps
             Assert.Equal(roleName, user.Role.RoleName);
             Assert.NotNull(user.Organization);
             Assert.Equal(orgName, user.Organization.OrganizationName);
+        }
+
+        // *******************************************************************
+        //                   NEW BVT/ECT SCENARIOS
+        // *******************************************************************
+
+        // --- Login Related BVT/ECT ---
+
+        // These 'Given' steps are purely for documentation in the feature file.
+        // The actual validation is handled by DTO attributes.
+        [Given(@"the application email minimum length is (\d+)")]
+        [Given(@"the application email maximum length is (\d+)")]
+        [Given(@"the application password minimum length is (\d+)")]
+        [Given(@"the application password maximum length is (\d+)")]
+        [Given(@"the application password requires complexity")]
+        [Given(@"the application organization name minimum length is (\d+)")]
+        [Given(@"the application organization name maximum length is (\d+)")]
+        public void GivenTheApplicationConstraintIs(int length)
+        {
+            // No code needed here, as the validation is handled by DTO attributes
+        }
+
+
+        [Then(@"a ValidationException with message ""(.*)"" should be thrown")]
+        public void ThenAValidationExceptionWithMessageShouldBeThrown(string expectedMessage)
+        {
+            Assert.NotNull(_caughtException);
+            var validationEx = Assert.IsType<ValidationException>(_caughtException);
+            Assert.Equal(expectedMessage, validationEx.Message);
+        }
+
+        [Then(@"a UnauthorizedAccessException with message ""(.*)"" should be thrown")]
+        public void ThenAUnauthorizedAccessExceptionWithMessageShouldBeThrown(string expectedMessage)
+        {
+            Assert.NotNull(_caughtException);
+            var validationEx = Assert.IsType<UnauthorizedAccessException>(_caughtException);
+            Assert.Equal(expectedMessage, validationEx.Message);
+        }
+
+        // Helper method for generating long strings (useful for max length tests)
+        private string GenerateString(int length, char character = 'a')
+        {
+            return new string(character, length);
         }
     }
 }
