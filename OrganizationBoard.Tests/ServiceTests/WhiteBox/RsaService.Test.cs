@@ -94,13 +94,13 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         }
 
         [Fact]
-        public void Decrypt_WithInvalidEncryptedData_ShouldThrowException()
+        public void Decrypt_WithInvalidEncryptedData_ShouldThrowInvalidOperationException()
         {
             // Arrange
             var invalidEncryptedData = "invalid base64 data";
 
             // Act & Assert
-            Assert.Throws<FormatException>(() => _rsaService.Decrypt(invalidEncryptedData));
+            Assert.Throws<InvalidOperationException>(() => _rsaService.Decrypt(invalidEncryptedData));
         }
 
         [Fact]
@@ -116,6 +116,110 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 
             // Assert
             Assert.Equal(originalData, decryptedData);
+        }
+
+        [Fact]
+        public void EncryptInternal_WithNullData_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            string nullData = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => _rsaService.EncryptInternal(nullData));
+        }
+
+        [Fact]
+        public void EncryptInternal_WithEmptyString_ShouldEncryptSuccessfully()
+        {
+            // Arrange
+            var emptyData = "";
+
+            // Act
+            var encryptedData = _rsaService.EncryptInternal(emptyData);
+
+            // Assert
+            Assert.NotNull(encryptedData);
+            Assert.NotEqual(emptyData, encryptedData);
+            Assert.True(IsBase64String(encryptedData));
+        }
+
+        [Fact]
+        public void EncryptOutside_WithNullData_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            string nullData = null;
+            var publicKey = _rsaService.GetPublicKey();
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => _rsaService.EncryptOutside(nullData, publicKey));
+        }
+
+        [Fact]
+        public void EncryptOutside_WithNullKey_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            var testData = "Test data";
+            string nullKey = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => _rsaService.EncryptOutside(testData, nullKey));
+        }
+
+        [Fact]
+        public void EncryptOutside_WithEmptyStringData_ShouldEncryptSuccessfully()
+        {
+            // Arrange
+            var emptyData = "";
+            var publicKey = _rsaService.GetPublicKey();
+
+            // Act
+            var encryptedData = _rsaService.EncryptOutside(emptyData, publicKey);
+
+            // Assert
+            Assert.NotNull(encryptedData);
+            Assert.NotEqual(emptyData, encryptedData);
+            Assert.True(IsBase64String(encryptedData));
+        }
+
+        [Fact]
+        public void EncryptOutside_WithEmptyStringKey_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            var testData = "Test data";
+            var emptyKey = "";
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => _rsaService.EncryptOutside(testData, emptyKey));
+        }
+
+        [Fact]
+        public void Decrypt_WithNullData_ShouldThrowArgumentNullException()
+        {
+            // Arrange
+            string nullData = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => _rsaService.Decrypt(nullData));
+        }
+
+        [Fact]
+        public void Decrypt_WithEmptyString_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            var emptyData = "";
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => _rsaService.Decrypt(emptyData));
+        }
+
+        [Fact]
+        public void Decrypt_WithValidBase64ButInvalidRsaData_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            var validBase64 = Convert.ToBase64String(new byte[] { 1, 2, 3, 4 }); // Valid base64 but not valid RSA data
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => _rsaService.Decrypt(validBase64));
         }
 
         private bool IsBase64String(string base64)

@@ -23,11 +23,26 @@ public class RsaService : IRsaService
 
     public string Decrypt(string encryptedData)
     {
-        var encryptedBytes = Convert.FromBase64String(encryptedData);
-        Console.WriteLine($"Private key size (bits): {_rsa.KeySize}");
-        Console.WriteLine($"Encrypted data length (bytes): {encryptedBytes.Length}");
-        var decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.OaepSHA256);
-        return Encoding.UTF8.GetString(decryptedBytes);
+        try
+        {
+            var encryptedBytes = Convert.FromBase64String(encryptedData);
+            Console.WriteLine($"Private key size (bits): {_rsa.KeySize}");
+            Console.WriteLine($"Encrypted data length (bytes): {encryptedBytes.Length}");
+            var decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.OaepSHA256);
+            return Encoding.UTF8.GetString(decryptedBytes);
+        }
+        catch (ArgumentNullException)
+        {
+            throw;
+        }
+        catch (CryptographicException ex)
+        {
+            throw new InvalidOperationException("Decryption failed. Data might be invalid or padding incorrect.", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred during decryption.", ex);
+        }
     }
     public string EncryptInternal(string RawData)
     {
@@ -36,6 +51,10 @@ public class RsaService : IRsaService
             var bytesToEncrypt = Encoding.UTF8.GetBytes(RawData);
             var encryptedBytes = _rsa.Encrypt(bytesToEncrypt, RSAEncryptionPadding.OaepSHA256);
             return Convert.ToBase64String(encryptedBytes);
+        }
+        catch (ArgumentNullException)
+        {
+            throw;
         }
         catch (CryptographicException ex)
         {
@@ -57,6 +76,10 @@ public class RsaService : IRsaService
     
     public string EncryptOutside(string RawData, string publicKeyPem)
     {
+        if (publicKeyPem == null)
+        {
+            throw new ArgumentNullException(nameof(publicKeyPem));
+        }
         try
         {
             var rsaDectypt = RSA.Create();
@@ -68,6 +91,10 @@ public class RsaService : IRsaService
             Console.WriteLine($"Private key size (bits): {rsaDectypt.KeySize}");
             Console.WriteLine($"Encrypted data length (bytes): {encryptedBytes.Length}");
             return Convert.ToBase64String(encryptedBytes);
+        }
+        catch (ArgumentNullException)
+        {
+            throw;
         }
         catch (CryptographicException ex)
         {
