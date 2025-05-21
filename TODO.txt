@@ -13,10 +13,6 @@ DONE: C05 - V04 - Input Validation, Prepared Statements/Queries
 DONE: C06 - V05 - Ensure no sensitive data is outputted in body/url
 
 
-
-- Code left to do
-TODO: Postman Testing for al API - Skal lige tjekkes med Niels
-
 - White Synopse
 TODO: DD Path Graphs på de mest interessant metoder (no way vi gider lave en for hver metode)
 TODO: Testing Methodology, overview of the testing we have done and how we did them. Include the removal of dupes in testing.

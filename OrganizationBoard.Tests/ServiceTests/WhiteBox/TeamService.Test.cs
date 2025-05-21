@@ -4,11 +4,37 @@ using EFrameWork.Model;
 using OrganizationBoard.Service;
 using Moq;
 using OrganizationBoard.DTO;
+using Polly;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
     public class TeamServiceTest
     {
+        private readonly Mock<IAsyncPolicy> _mockRetryPolicy;
+
+        public TeamServiceTest()
+        {
+            _mockRetryPolicy = new Mock<IAsyncPolicy>();
+
+            // Task<OperationResponse<TeamDto>> - Used: CreateTeam, UpdateTeamName
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<TeamDto>>>>()))
+                .Returns<Func<Task<OperationResponse<TeamDto>>>>(action => action());
+
+            // Task<OperationResponse<bool>> - Used: DeleteTeam, AssignUserToTeam, RemoveUserFromTeam
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<bool>>>>()))
+                .Returns<Func<Task<OperationResponse<bool>>>>(action => action());
+
+            // Task<OperationResponse<List<UserDto>>> - Used: GetTeamMembers
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<List<UserDto>>>>>()))
+                .Returns<Func<Task<OperationResponse<List<UserDto>>>>>(action => action());
+
+            // OperationResponse<T> - Optional: Catch-All
+            _mockRetryPolicy.Setup(m => m.ExecuteAsync(It.IsAny<Func<Task<OperationResponse<object>>>>()))
+                .Returns<Func<Task<OperationResponse<object>>>>(action => action());
+        }
         private OBDbContext GetInMemoryDbContext(string dbName = "TeamServiceTests")
         {
             var options = new DbContextOptionsBuilder<OBDbContext>()
@@ -38,7 +64,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("NotLeaderTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.CreateTeam(new TeamDto { TeamName = "Dev Team" }, 3); //Not a leader ID
@@ -54,7 +80,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("ValidAdminTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.CreateTeam(new TeamDto { TeamID = 3, TeamName = "Success Team" }, 1);
@@ -72,7 +98,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("ExceptionTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.CreateTeam(new TeamDto { TeamName = null }, 1); // This will cause an exception because TeamName is null
@@ -91,7 +117,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("NotLeaderUpdateTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateTeamName(new TeamDto { TeamName = "Team 1" }, 3);
@@ -106,7 +132,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("NotFoundTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateTeamName(new TeamDto { TeamID = 999, TeamName = "Nonexistent Team" }, 2);
@@ -122,7 +148,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("ValidUpdateTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateTeamName(new TeamDto { TeamID = 2, TeamName = "Updated Team" }, 4);
@@ -142,7 +168,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("ValidDeleteTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.DeleteTeam(2, 1);
@@ -160,7 +186,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("NotMemberGetMembersTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.GetTeamMembers(2, 2); // User 1 is leader, but isn't in team 2
@@ -179,7 +205,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             // Adding a team with no members
             context.TeamTables.Add(new Team { TeamID = 5, TeamName = "Empty Team" });
             await context.SaveChangesAsync();
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.GetTeamMembers(5, 1); // Team 5 has no members
@@ -198,7 +224,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             // Add users to team 1
             context.UserTables.Add(new User { UserID = 99, RoleID = 3, Email = "Test99@email.com", Password = "1234", OrganizationID = 1, TeamID = 1 });
             await context.SaveChangesAsync();
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.GetTeamMembers(1, 2); // Team 1 has members
@@ -208,7 +234,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             Assert.Equal("Members retrieved successfully.", result.Message);
             Assert.NotEmpty(result.Data);
         }
-    
+
         #endregion Tests for GetTeamMembers
 
         #region Tests for AssignUserToTeam
@@ -218,7 +244,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("AssignUserToTeamUserNotFoundTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.AssignUserToTeam(1, 999, 1);
@@ -233,7 +259,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("AssignUserToTeamUserNotFoundTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.AssignUserToTeam(2, 3, 1);
@@ -248,7 +274,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("ValidAssignTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.AssignUserToTeam(1, 5, 1); // Assign user 5 to team 1
@@ -267,7 +293,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("ValidRemoveTest");
-            var service = new TeamService(context);
+            var service = new TeamService(context, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.RemoveUserFromTeam(1, 3, 1); // Remove user 3 from team 1

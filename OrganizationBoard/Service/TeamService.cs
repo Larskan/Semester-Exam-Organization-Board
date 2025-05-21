@@ -7,15 +7,18 @@ using Microsoft.EntityFrameworkCore;
 using EFramework.Data;
 using EFrameWork.Model;
 using OrganizationBoard.IService;
+using Polly;
 
 namespace OrganizationBoard.Service
 {
     public class TeamService : ITeamService
     {
         private readonly OBDbContext _context;
-        public TeamService(OBDbContext context)
+        private readonly IAsyncPolicy _retryPolicy;
+        public TeamService(OBDbContext context, IAsyncPolicy retryPolicy)
         {
             _context = context;
+            _retryPolicy = retryPolicy;
         }
 
         #region Private Methods
@@ -45,16 +48,19 @@ namespace OrganizationBoard.Service
 
             try
             {
-                var newTeam = new Team
+                return await _retryPolicy.ExecuteAsync(async () =>
                 {
-                    TeamName = team.TeamName
-                };
-                _context.TeamTables.Add(newTeam);
-                await _context.SaveChangesAsync();
+                    var newTeam = new Team
+                    {
+                        TeamName = team.TeamName
+                    };
+                    _context.TeamTables.Add(newTeam);
+                    await _context.SaveChangesAsync();
 
-                team.TeamID = newTeam.TeamID;
+                    team.TeamID = newTeam.TeamID;
 
-                return new OperationResponse<TeamDto>(team, "Team created successfully.");
+                    return new OperationResponse<TeamDto>(team, "Team created successfully.");
+                });
             }
             catch (Exception ex)
             {
@@ -68,13 +74,16 @@ namespace OrganizationBoard.Service
                     return new OperationResponse<TeamDto>("Access Denied.", false, 403);
             try
             {
-                var existingTeam = _context.TeamTables!.FirstOrDefault(t => t.TeamID == team.TeamID);
-                if (existingTeam == null)
-                    return new OperationResponse<TeamDto>("Team not found.", false, 404);
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var existingTeam = _context.TeamTables!.FirstOrDefault(t => t.TeamID == team.TeamID);
+                    if (existingTeam == null)
+                        return new OperationResponse<TeamDto>("Team not found.", false, 404);
 
-                existingTeam.TeamName = team.TeamName;
-                await _context.SaveChangesAsync();
-                return new OperationResponse<TeamDto>(team, "Team updated successfully.");
+                    existingTeam.TeamName = team.TeamName;
+                    await _context.SaveChangesAsync();
+                    return new OperationResponse<TeamDto>(team, "Team updated successfully.");
+                });
             }
             catch (Exception ex)
             {
@@ -89,14 +98,17 @@ namespace OrganizationBoard.Service
 
             try
             {
-                var team = _context.TeamTables!.FirstOrDefault(t => t.TeamID == teamId);
-                if (team == null)
-                    return new OperationResponse<bool>("Team not found.", false, 404);
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var team = _context.TeamTables!.FirstOrDefault(t => t.TeamID == teamId);
+                    if (team == null)
+                        return new OperationResponse<bool>("Team not found.", false, 404);
 
-                _context.TeamTables!.Remove(team);
-                await _context.SaveChangesAsync();
+                    _context.TeamTables!.Remove(team);
+                    await _context.SaveChangesAsync();
 
-                return new OperationResponse<bool>(true, "Team deleted successfully.");
+                    return new OperationResponse<bool>(true, "Team deleted successfully.");
+                });
 
             }
             catch (Exception ex)
@@ -113,19 +125,22 @@ namespace OrganizationBoard.Service
 
             try
             {
-                // This query will never return a null, if empty, its returns empty list.
-                var members = _context.UserTables!.Where(u => u.TeamID == teamId).ToList();
-                if (members.Count == 0)
-                    return new OperationResponse<List<UserDto>>("No members found in this team.", false, 404);
-
-                var memberDtos = members.Select(u => new UserDto
+                return await _retryPolicy.ExecuteAsync(async () =>
                 {
-                    Email = u.Email,
-                    RoleID = u.RoleID,
-                    TeamID = u.TeamID
-                }).ToList();
+                    // This query will never return a null, if empty, its returns empty list.
+                    var members = _context.UserTables!.Where(u => u.TeamID == teamId).ToList();
+                    if (members.Count == 0)
+                        return new OperationResponse<List<UserDto>>("No members found in this team.", false, 404);
 
-                return new OperationResponse<List<UserDto>>(memberDtos, "Members retrieved successfully.");
+                    var memberDtos = members.Select(u => new UserDto
+                    {
+                        Email = u.Email,
+                        RoleID = u.RoleID,
+                        TeamID = u.TeamID
+                    }).ToList();
+
+                    return new OperationResponse<List<UserDto>>(memberDtos, "Members retrieved successfully.");
+                });
             }
             catch (Exception ex)
             {
@@ -140,20 +155,23 @@ namespace OrganizationBoard.Service
 
             try
             {
-                var team = await _context.TeamTables.Include(t => t.Users).FirstOrDefaultAsync(t => t.TeamID == teamId);
-                if (team == null)
-                    return new OperationResponse<bool>("No such team.", false, 404);
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var team = await _context.TeamTables.Include(t => t.Users).FirstOrDefaultAsync(t => t.TeamID == teamId);
+                    if (team == null)
+                        return new OperationResponse<bool>("No such team.", false, 404);
 
-                var userToAssign = await _context.UserTables.FindAsync(userIdToAssign);
-                if (userToAssign == null)
-                    return new OperationResponse<bool>("No user found.", false, 404);
+                    var userToAssign = await _context.UserTables.FindAsync(userIdToAssign);
+                    if (userToAssign == null)
+                        return new OperationResponse<bool>("No user found.", false, 404);
 
-                if (userToAssign.TeamID != null)
-                    return new OperationResponse<bool>("User is already assigned to a team.", false, 400);
+                    if (userToAssign.TeamID != null)
+                        return new OperationResponse<bool>("User is already assigned to a team.", false, 400);
 
-                team.Users.Add(userToAssign);
-                await _context.SaveChangesAsync();
-                return new OperationResponse<bool>(true, "User assigned to team successfully.");
+                    team.Users.Add(userToAssign);
+                    await _context.SaveChangesAsync();
+                    return new OperationResponse<bool>(true, "User assigned to team successfully.");
+                });
 
             }
             catch (Exception ex)
@@ -169,17 +187,20 @@ namespace OrganizationBoard.Service
 
             try
             {
-                var team = await _context.TeamTables.Include(t => t.Users).FirstOrDefaultAsync(t => t.TeamID == teamId);
-                if (team == null)
-                    return new OperationResponse<bool>("No such team.", false, 404);
+                return await _retryPolicy.ExecuteAsync(async () =>
+                {
+                    var team = await _context.TeamTables.Include(t => t.Users).FirstOrDefaultAsync(t => t.TeamID == teamId);
+                    if (team == null)
+                        return new OperationResponse<bool>("No such team.", false, 404);
 
-                var userToAssign = await _context.UserTables.FindAsync(userIdToRemove);
-                if (userToAssign == null)
-                    return new OperationResponse<bool>("No user found.", false, 404);
+                    var userToAssign = await _context.UserTables.FindAsync(userIdToRemove);
+                    if (userToAssign == null)
+                        return new OperationResponse<bool>("No user found.", false, 404);
 
-                team.Users.Remove(userToAssign);
-                await _context.SaveChangesAsync();
-                return new OperationResponse<bool>(true, "User removed from team successfully.");
+                    team.Users.Remove(userToAssign);
+                    await _context.SaveChangesAsync();
+                    return new OperationResponse<bool>(true, "User removed from team successfully.");
+                });
 
             }
             catch (Exception ex)

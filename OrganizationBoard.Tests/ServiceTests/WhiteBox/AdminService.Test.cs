@@ -5,15 +5,44 @@ using OrganizationBoard.Service;
 using Moq;
 using OrganizationBoard.DTO;
 using OrganizationBoard.IService;
+using Polly;
 
 namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
 {
     public class AdminServiceTest
     {
         private Mock<IBCryptService> _mockBCryptService;
+        private readonly Mock<IAsyncPolicy> _mockRetryPolicy;
         public AdminServiceTest()
         {
             _mockBCryptService = new Mock<IBCryptService>();
+
+            _mockRetryPolicy = new Mock<IAsyncPolicy>();
+
+            // Task<OperationResponse<UserCreateDto>> - Used in: CreateUser, UpdateUser
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<UserCreateDto>>>>()))
+                .Returns<Func<Task<OperationResponse<UserCreateDto>>>>(action => action());
+
+            // Task<OperationResponse<bool>> - Used in: DeleteUser
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<bool>>>>()))
+                .Returns<Func<Task<OperationResponse<bool>>>>(action => action());
+
+            // Task<OperationResponse<UserDto>> - Used in: GetUser
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<UserDto>>>>()))
+                .Returns<Func<Task<OperationResponse<UserDto>>>>(action => action());
+
+            // Task<OperationResponse<List<UserDto>>> - Used in: GetAllUsers
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<List<UserDto>>>>>()))
+                .Returns<Func<Task<OperationResponse<List<UserDto>>>>>(action => action());
+
+            // Task<OperationResponse<Organization>> - Used in: UpdateOrganization
+            _mockRetryPolicy.Setup(p => p.ExecuteAsync(
+                It.IsAny<Func<Task<OperationResponse<Organization>>>>()))
+                .Returns<Func<Task<OperationResponse<Organization>>>>(action => action());
         }
 
 
@@ -48,7 +77,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             // Arrange
             var context = GetInMemoryDbContext("NotAdminTest");
             var mockBCrypt = new Mock<IBCryptService>();
-            var service = new AdminService(context, mockBCrypt.Object);
+            var service = new AdminService(context, mockBCrypt.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.CreateUser(new UserCreateDto { }, requestingAdminId: 2);
@@ -65,7 +94,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var context = GetInMemoryDbContext("EmailExistsTest");
             var mockBCrypt = new Mock<IBCryptService>();
 
-            var service = new AdminService(context, mockBCrypt.Object);
+            var service = new AdminService(context, mockBCrypt.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.CreateUser(new UserCreateDto
@@ -87,7 +116,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             var mockBCrypt = new Mock<IBCryptService>();
             mockBCrypt.Setup(s => s.HashPassword(It.IsAny<string>())).Returns("");
 
-            var service = new AdminService(context, mockBCrypt.Object);
+            var service = new AdminService(context, mockBCrypt.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.CreateUser(new UserCreateDto
@@ -113,7 +142,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             // Force HashPassword to throw.
             mockBCrypt.Setup(s => s.HashPassword(It.IsAny<string>())).Throws(new Exception("Hashing Failure"));
 
-            var service = new AdminService(context, mockBCrypt.Object);
+            var service = new AdminService(context, mockBCrypt.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.CreateUser(new UserCreateDto { Password = "Lars123!" }, requestingAdminId: 1);
@@ -131,7 +160,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("UserNotFoundTest");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateUser(new UserCreateDto
@@ -149,7 +178,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("EmailConflictTest");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateUser(new UserCreateDto
@@ -170,7 +199,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
             // Arrange
             var context = GetInMemoryDbContext("SuccessfulUpdateTest");
             _mockBCryptService.Setup(s => s.HashPassword(It.IsAny<string>())).Returns("");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateUser(new UserCreateDto
@@ -193,7 +222,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("SuccessfulDeleteTest");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.DeleteUser(3, 1);
@@ -211,7 +240,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("SuccessfulGetUserTest");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.GetUser(3, 1);
@@ -228,7 +257,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("SuccessfulGetAllUsersTest");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.GetAllUsers(1);
@@ -245,7 +274,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("OrgNotFoundTest");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateOrganization(new Organization
@@ -265,7 +294,7 @@ namespace OrganizationBoard.Tests.ServiceTests.WhiteBox
         {
             // Arrange
             var context = GetInMemoryDbContext("SuccessfulUpdateOrgTest");
-            var service = new AdminService(context, _mockBCryptService.Object);
+            var service = new AdminService(context, _mockBCryptService.Object, _mockRetryPolicy.Object);
 
             // Act
             var result = await service.UpdateOrganization(new Organization
